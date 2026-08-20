@@ -3,6 +3,9 @@
 
 #include "config.h"
 
+void map_init(void);
 void map_draw(void);
+
+int map_is_wall(int y, int x);
 
 #endif
