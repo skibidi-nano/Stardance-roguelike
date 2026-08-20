@@ -1,59 +1,44 @@
 #include <ncurses.h>
 #include <stdlib.h>
+#include <math.h>
+#include "map.h"
+#include "config.h"
 
-const int height = 20;
-const int width = 100;
+void game_refresh(int ptr_player_y, int ptr_player_x);
 
 int main(void)
 {
     //setup for screen/ncurses
     initscr();
     cbreak();
-    noecho(); 
+    noecho();
 
-    mvprintw(0, 0, "Press WASD to move or q to quit");
-
-    char map[height][width];
-    for (int i = 0; i < height; i++)
-    {
-        for (int k = 0; k < width; k++)
-        {
-            if ((k == 0 || k == width -1) || (i == 0 || i == height -1))
-            {
-                map[i][k] = '#';
-                mvprintw(i, k, "%c", map[i][k]);
-            }
-            else
-            {
-                map[i][k] = ' ';
-            }
-        }
-    }
+    int player_y = MAP_HEIGHT / 2;
+    int player_x = MAP_WIDTH / 2;
 
     int ch;
+
+    
+    game_refresh(player_y, player_x);
+
     while ((ch = getch()) != 'q')
     {
-        clear();
 
         switch(ch) 
         {
-            case 'w':
-                mvprintw(2, 0, "@");
-                break;
-            case 'd':
-                mvprintw(2, 0, "@");
-                break;
-            case 's':
-                mvprintw(2, 0, "@");
-                break;
-            case 'a':
-                mvprintw(2, 0, "@");
-                break;
-
+            case 'w': player_y--; break;
         }
-        refresh();
+        game_refresh(player_y, player_x);
     }
 
     endwin();
     return 0;
+}
+
+void game_refresh(int player_y, int player_x)
+{
+    clear();
+    map_draw();
+    mvaddch(player_y, player_x, '@');
+    refresh();
 }

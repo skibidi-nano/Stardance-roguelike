@@ -1,0 +1,2 @@
+#define MAP_HEIGHT 20
+#define MAP_WIDTH 100
