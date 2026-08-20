@@ -5,6 +5,7 @@ pkgs.mkShell {
     clang
     clang-tools 
     gdb         
-    gnumake     
+    gnumake
+    ncurses   
   ];
 }
