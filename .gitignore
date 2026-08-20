@@ -1,0 +1,21 @@
+# Nix / NixOS Build-Artefakte & Environment Links
+result
+result-*
+.direnv/
+.nix-gc-roots/
+
+# C / Makefile Build-Artefakte
+*.o
+*.a
+*.so
+*.out
+*.app
+
+# Häufige Binary/Executable Namen (passe deinen Dateinamen ggf. an)
+main
+game
+
+# Editor & System
+.DS_Store
+*.swp
+*~
