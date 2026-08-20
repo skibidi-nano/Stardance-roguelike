@@ -1,0 +1,50 @@
+[
+  {
+    "file": "main.c",
+    "arguments": [
+      "clang",
+      "-ggdb3",
+      "-O1",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-unused-variable",
+      "-Wshadow",
+      "-MMD",
+      "-MP",
+      "-c",
+      "main.c",
+      "-o",
+      "main.o"
+    ],
+    "directory": "/home/j/Projects/roguelike-stardance",
+    "output": "main.o"
+  },
+  {
+    "file": "map.c",
+    "arguments": [
+      "clang",
+      "-ggdb3",
+      "-O1",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-sign-compare",
+      "-Wno-unused-parameter",
+      "-Wno-unused-variable",
+      "-Wshadow",
+      "-MMD",
+      "-MP",
+      "-c",
+      "map.c",
+      "-o",
+      "map.o"
+    ],
+    "directory": "/home/j/Projects/roguelike-stardance",
+    "output": "map.o"
+  }
+]

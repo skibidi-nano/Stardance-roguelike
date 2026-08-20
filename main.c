@@ -4,7 +4,7 @@
 #include "map.h"
 #include "config.h"
 
-void game_refresh(int ptr_player_y, int ptr_player_x);
+void game_refresh(int player_y, int player_x);
 
 int main(void)
 {
@@ -27,6 +27,9 @@ int main(void)
         switch(ch) 
         {
             case 'w': player_y--; break;
+            case 's': player_y++; break;
+            case 'a': player_x--; break;
+            case 'd': player_x++; break;
         }
         game_refresh(player_y, player_x);
     }
