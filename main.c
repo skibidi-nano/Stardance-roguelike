@@ -25,8 +25,8 @@ int main(void)
     int ch;
     while ((ch = getch()) != 'q')
     {
-            int next_y = player_y;
-            int next_x = player_x;
+        int next_y = player_y;
+        int next_x = player_x;
 
         switch(ch) 
         {
@@ -35,14 +35,21 @@ int main(void)
             case 'a': next_x--; break;
             case 'd': next_x++; break;
         }
+
+        if (map_is_door(next_y, next_x))
+        {
+            map_init();
+            player_y = 1;
+            player_x = 1;
+        }
         //wall collision check
-        if (!map_is_wall(next_y, next_x))
+        else if (!map_is_wall(next_y, next_x))
         {
             player_y = next_y;
             player_x = next_x;
         }
-        game_refresh(player_y, player_x);
 
+        game_refresh(player_y, player_x);
     }
 
     endwin();

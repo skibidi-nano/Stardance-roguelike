@@ -11,17 +11,23 @@ void map_init(void)
 {
 
     current_room = random_room_gen();
+
+
     for (int y = 0; y < current_room.height; y++)
     {
         for (int x = 0; x < current_room.width; x++)
         {
-            if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
+            if (y == current_room.door_y && x == current_room.door_x)
             {
-                map[y][x] = '#';
+                map[y][x] = '-'; //door symbol
+            }
+            else if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
+            {
+                map[y][x] = '#'; //wall symbol
             }
             else
             {
-                map[y][x] = '.';
+                map[y][x] = '.'; //floor symbol
             }
         }
     }
@@ -48,4 +54,13 @@ int map_is_wall(int y, int x)
         return 1;
     }
     return map[y][x] == '#';
+}
+
+int map_is_door(int y, int x)
+{
+    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
+    {
+        return 0;
+    }
+    return map[y][x] == '-';
 }
