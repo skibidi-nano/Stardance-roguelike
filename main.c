@@ -1,8 +1,6 @@
 #include <ncurses.h>
 #include <stdlib.h>
-#include <math.h>
 #include "map.h"
-#include "config.h"
 
 void game_refresh(int player_y, int player_x);
 
@@ -17,8 +15,8 @@ int main(void)
     map_init();
 
     //player starting position (prob will be changed)
-    int player_y = MAP_HEIGHT / 2;
-    int player_x = MAP_WIDTH / 2;
+    int player_y = 1;
+    int player_x = 1;
     
     //inital map generation
     game_refresh(player_y, player_x);

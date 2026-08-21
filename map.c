@@ -1,22 +1,27 @@
-#include "map.h"
 #include <ncurses.h>
+#include "map.h"
+#include "generation.h"
 
-static char map[MAP_HEIGHT][MAP_WIDTH];
+static char map[MAX_HEIGHT][MAX_WIDTH];
+static room current_room;
+
 
 //initialisation of the map array
 void map_init(void)
 {
-    for (int y = 0; y < MAP_HEIGHT; y++)
+
+    current_room = random_room_gen();
+    for (int y = 0; y < current_room.height; y++)
     {
-        for (int x = 0; x < MAP_WIDTH; x++)
+        for (int x = 0; x < current_room.width; x++)
         {
-            if (y == 0 || y == MAP_HEIGHT -1 || x == 0 || x == MAP_WIDTH -1)
+            if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
             {
                 map[y][x] = '#';
             }
             else
             {
-                map[y][x] = ' ';
+                map[y][x] = '.';
             }
         }
     }
@@ -25,9 +30,9 @@ void map_init(void)
 //Puts the map on the screen
 void map_draw(void)
 {
-    for (int y = 0; y < MAP_HEIGHT; y++)
+    for (int y = 0; y < current_room.height; y++)
     {
-        for (int x = 0; x < MAP_WIDTH; x++)
+        for (int x = 0; x < current_room.width; x++)
         {
             mvaddch(y, x, map[y][x]);
         }
@@ -38,7 +43,7 @@ void map_draw(void)
 int map_is_wall(int y, int x)
 {
     //everything outside of the map is treated as a wall
-    if (y < 0 || y >= MAP_HEIGHT || x < 0 || x >= MAP_WIDTH)
+    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
     {
         return 1;
     }
