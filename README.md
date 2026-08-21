@@ -3,11 +3,12 @@
 ## This is a game where you run around in random generated rooms and fight evil pointers and memory addresses for as long as you can until you die!
 
 Key features of the game:
-  - implemented in a CLI environment
-  - random generated rooms
-  - (coming soon!) enemies in said rooms
-  - (coming soon!) a RPG inspired battle screen/system
-  - (coming soon!) a highscore feature to track how many enemies you have beaten
+  - ASCII-based player rendering and movement
+  - Dynamic collision detection with map boundaries
+  - Procedurally generated maps on launch
+  - (coming soon!) Enemies in said rooms
+  - (coming soon!) A RPG inspired battle screen/system
+  - (coming soon!) A highscore feature to track how many enemies you have beaten
 
 
 DEMO URL:
