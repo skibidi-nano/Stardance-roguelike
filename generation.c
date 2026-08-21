@@ -2,7 +2,7 @@
 #include "config.h"
 #include "generation.h"
 
-static int get_random_int(int min, int max)
+int get_random_int(int min, int max)
 {
     return (rand() % (max - min + 1)) + min;
 }
@@ -10,6 +10,7 @@ static int get_random_int(int min, int max)
 //Generates the info for random rooms (width, height and corner coordinates)
 room random_room_gen(void)
 {
+    //initialize the room variables
     room rndm_room;
     rndm_room.x = 0;
     rndm_room.y = 0;
@@ -21,6 +22,7 @@ room random_room_gen(void)
     //choose random wall (0 for north wall, 1 for south wall, 2 for west wall, 3 for east wall)
     int wall_side = get_random_int(0, 3);
     
+    //Door position selection
     switch (wall_side)
     {
         case 0: //North wall

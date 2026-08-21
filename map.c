@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include "map.h"
 #include "generation.h"
+#include "npc.h"
 
 static char map[MAX_HEIGHT][MAX_WIDTH];
 static room current_room;
@@ -12,6 +13,7 @@ void map_init(void)
 
     current_room = random_room_gen();
 
+    npc enemy  = npc_init(current_room.width, current_room.height);
 
     for (int y = 0; y < current_room.height; y++)
     {
@@ -19,7 +21,11 @@ void map_init(void)
         {
             if (y == current_room.door_y && x == current_room.door_x)
             {
-                map[y][x] = '-'; //door symbol
+                map[y][x] = '0'; //door symbol
+            }
+            else if (y == enemy.npc_y && x == enemy.npc_x)
+            {
+                map[y][x] = '&'; //door symbol
             }
             else if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
             {
@@ -62,5 +68,14 @@ int map_is_door(int y, int x)
     {
         return 0;
     }
-    return map[y][x] == '-';
+    return map[y][x] == '0';
+}
+
+int map_is_enemy(int y, int x)
+{
+    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
+    {
+        return 0;
+    }
+    return map[y][x] == '&';
 }

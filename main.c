@@ -42,6 +42,11 @@ int main(void)
             player_y = 1;
             player_x = 1;
         }
+        //player-enemy collision check
+        else if(map_is_enemy(next_y, next_x))
+        {
+            map_init(); //for testing purpose
+        }
         //wall collision check
         else if (!map_is_wall(next_y, next_x))
         {
