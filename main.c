@@ -1,6 +1,9 @@
 #include <ncurses.h>
 #include <stdlib.h>
+#include "menu.h"
 #include "map.h"
+#include "battle_screen.h"
+#include "config.h"
 
 void game_refresh(int player_y, int player_x);
 
@@ -14,47 +17,68 @@ int main(void)
     //sets the map array up
     map_init();
 
+    gamestate current_gamestate = STATE_MENU;
+
     //player starting position (prob will be changed)
     int player_y = 1;
     int player_x = 1;
     
-    //inital map generation
-    game_refresh(player_y, player_x);
+    //first menu init
+    menu_init();
+    menu_draw();
 
-    //further map generation for the rest of the game
-    int ch;
-    while ((ch = getch()) != 'q')
+    //main loop
+    int user_input;
+    while ((user_input = getch()) != 'q')
     {
-        int next_y = player_y;
-        int next_x = player_x;
 
-        switch(ch) 
+        if (current_gamestate == STATE_MENU)
         {
-            case 'w': next_y--; break;
-            case 's': next_y++; break;
-            case 'a': next_x--; break;
-            case 'd': next_x++; break;
-        }
-
-        if (map_is_door(next_y, next_x))
-        {
-            map_init();
-            player_y = 1;
-            player_x = 1;
-        }
-        //player-enemy collision check
-        else if(map_is_enemy(next_y, next_x))
-        {
-            map_init(); //for testing purpose
-        }
-        //wall collision check
-        else if (!map_is_wall(next_y, next_x))
-        {
-            player_y = next_y;
-            player_x = next_x;
+            menu_init();
+            menu_draw();
+            switch(user_input) 
+            {
+                case '1': current_gamestate = STATE_MAP; break;
+            }
         }
 
-        game_refresh(player_y, player_x);
+        if (current_gamestate == STATE_MAP)
+        {
+            int next_y = player_y;
+            int next_x = player_x;
+
+            //action based on input
+            switch(user_input) 
+            {
+                case 'w': next_y--; break;
+                case 's': next_y++; break;
+                case 'a': next_x--; break;
+                case 'd': next_x++; break;
+            }
+
+            //door collision check
+            if (map_is_door(next_y, next_x))
+            {
+                map_init();
+                player_y = 1;
+                player_x = 1;
+            }
+            //player-enemy collision check
+            else if(map_is_enemy(next_y, next_x))
+            {
+                battle_screen_init();
+                battle_screen_draw();
+            }
+            //wall collision check
+            else if (!map_is_wall(next_y, next_x))
+            {
+                player_y = next_y;
+             player_x = next_x;
+            }
+
+            game_refresh(player_y, player_x);
+        }
+        
     }
 
     endwin();

@@ -25,7 +25,7 @@ void map_init(void)
             }
             else if (y == enemy.npc_y && x == enemy.npc_x)
             {
-                map[y][x] = '&'; //door symbol
+                map[y][x] = '&'; //enemie symbol (evil pointer)
             }
             else if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
             {
