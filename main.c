@@ -5,7 +5,7 @@
 #include "battle_screen.h"
 #include "config.h"
 
-void game_refresh(int player_y, int player_x);
+void map_refresh(int player_y, int player_x);
 
 int main(void)
 {
@@ -66,6 +66,7 @@ int main(void)
             //player-enemy collision check
             else if(map_is_enemy(next_y, next_x))
             {
+                current_gamestate = STATE_BATTLE;
                 battle_screen_init();
                 battle_screen_draw();
             }
@@ -73,10 +74,16 @@ int main(void)
             else if (!map_is_wall(next_y, next_x))
             {
                 player_y = next_y;
-             player_x = next_x;
+                player_x = next_x;
             }
 
-            game_refresh(player_y, player_x);
+            map_refresh(player_y, player_x);
+        }
+
+        if (current_gamestate == STATE_BATTLE)
+        {
+            battle_screen_init();
+            battle_screen_draw();
         }
         
     }
@@ -86,7 +93,7 @@ int main(void)
 }
 
 // refreshes the game (duh)
-void game_refresh(int player_y, int player_x)
+void map_refresh(int player_y, int player_x)
 {
     clear();
     map_draw();

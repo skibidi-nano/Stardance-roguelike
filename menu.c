@@ -34,7 +34,7 @@ void menu_draw(void)
         }
     }
 
-    mvprintw(2, 15, "CURRENT HIGHSCORE: test");
+    mvprintw(2, 13, "CURRENT HIGHSCORE: PLACEHOLDER");
     mvprintw(4, 19, "[1] START GAME");
     mvprintw(6, 19, "[q] QUIT GAME");
 

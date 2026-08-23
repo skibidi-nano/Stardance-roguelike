@@ -10,7 +10,7 @@ typedef enum
 } gamestate;
 
 //For menu size (pls dont change)
-#define MENU_WIDTH 50
+#define MENU_WIDTH 56
 #define MENU_HEIGHT 10
 
 //For map gen
@@ -21,6 +21,6 @@ typedef enum
 
 //For battle screen gen
 #define BATTLE_SCREEN_WIDTH 80
-#define BATTLE_SCREEN_HEIGHT 40
+#define BATTLE_SCREEN_HEIGHT 20
 
 #endif

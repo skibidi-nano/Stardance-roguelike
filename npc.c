@@ -1,6 +1,9 @@
+#include <stdlib.h>
+#include <ncurses.h>
 #include "npc.h"
 #include "generation.h"
-#include <stdlib.h>
+#include "entity.h"
+
 
 npc npc_init(int map_width, int map_height)
 {
@@ -13,4 +16,26 @@ npc npc_init(int map_width, int map_height)
     } while (enemy.npc_x == 1 && enemy.npc_y == 1);
 
     return enemy;
+}
+
+entity standard_enemy_stats(int max, int current, int power)
+{
+    entity standard_enemy;
+
+    standard_enemy.max_hp = max;
+    standard_enemy.current_hp = current;
+    standard_enemy.attack_power = power;
+
+    return standard_enemy;
+}
+
+
+void standard_enemy_sprite(void)
+{
+    //main enemy (pointer sprite)
+    mvprintw(2, 59, "\\  |  /");
+    mvprintw(3, 60, "\\ | /");
+    mvprintw(4, 57, "---- * ----");
+    mvprintw(5, 60, "/ | \\");
+    mvprintw(6, 59, "/  |  \\"); 
 }
