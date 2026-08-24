@@ -22,6 +22,7 @@ int main(void)
     //player starting position (prob will be changed)
     int player_y = 1;
     int player_x = 1;
+    int battle_check = 0;
     
     //first menu init
     menu_init();
@@ -67,8 +68,7 @@ int main(void)
             else if(map_is_enemy(next_y, next_x))
             {
                 current_gamestate = STATE_BATTLE;
-                battle_screen_init();
-                battle_screen_draw();
+                battle_check = 0;
             }
             //wall collision check
             else if (!map_is_wall(next_y, next_x))
@@ -82,8 +82,35 @@ int main(void)
 
         if (current_gamestate == STATE_BATTLE)
         {
-            battle_screen_init();
+            static int selection = 1;
+            static int lock = 0;
+            if(battle_check == 0)
+            {    
+                battle_screen_init();
+                battle_init();
+                battle_check++;
+            }
+
+            switch(user_input) 
+            {
+                case 'w': selection--; break;
+                case 's': selection++; break;
+                case ENTER : lock = ENTER; break;
+            }
             battle_screen_draw();
+            static int outcome = 0;
+            outcome = process_battle_turn(battle_check, selection, lock);
+            if (outcome == 1)
+            {
+                current_gamestate = STATE_MAP;
+            }
+            else if (outcome == 0)
+            {
+                mvaddch(10, 10, 'g');
+                //need to add highscore/score function
+                //need to add sleep function
+                current_gamestate = STATE_MENU;
+            }
         }
         
     }

@@ -23,4 +23,5 @@ typedef enum
 #define BATTLE_SCREEN_WIDTH 80
 #define BATTLE_SCREEN_HEIGHT 20
 
+#define ENTER 10
 #endif
