@@ -76,7 +76,7 @@ int map_is_wall(int y, int x)
 
 int map_is_door(int y, int x)
 {
-    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
+    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width || enemy_counter != 0)
     {
         return 0;
     }

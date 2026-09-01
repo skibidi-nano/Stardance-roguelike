@@ -6,9 +6,13 @@ Key features of the game:
   - ASCII-based player rendering and movement
   - Dynamic collision detection with map boundaries
   - Procedurally generated maps on launch
-  - (coming soon!) Enemies in said rooms
-  - (coming soon!) A RPG inspired battle screen/system
+  - Enemies in the randomly generated rooms
+  - A RPG inspired battle screen/system
+  - Only leaving the room after beating every enemy
   - (coming soon!) A highscore feature to track how many enemies you have beaten
+  - (coming soon!) Power ups to make you stronger
+  - (coming soon!) Stronger enemies and boss fights!
+  - (coming soon!) Items to use in battle
 
 
 DEMO URL:
