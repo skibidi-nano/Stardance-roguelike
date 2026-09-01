@@ -5,6 +5,8 @@
 #include "npc.h"
 #include "player.h"
 #include "entity.h"
+#include "map.h"
+#include "npc.h"
 
 static char battle_screen[BATTLE_SCREEN_HEIGHT][BATTLE_SCREEN_WIDTH];
 
@@ -13,11 +15,12 @@ static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
 static entity enemy  = { .max_hp = 20, .current_hp = 20, .attack_power = 3 };
 //sets the stats for the entities that are fighting
 
-int process_battle_turn(int init_mode, int selection, int lock)
+battle_result process_battle_turn(int init_mode, choice selection, int lock, int enemy_x, int enemy_y)
 {
     //static so they store the same addresses across loops
     static entity *player_ptr = NULL;
     static entity *enemy_ptr = NULL;
+    npc *enemies = position_of_enemy_array();
     static turn_player current_turn = TURN_PLAYER;
 
     //gets called one to set up the entities
@@ -26,36 +29,17 @@ int process_battle_turn(int init_mode, int selection, int lock)
         player_ptr = &player;
         enemy_ptr = &enemy;
         current_turn = TURN_PLAYER; //default starting turn is player
-        return 3;
+        return BATTLE_SETUP;
     }
 
     //check for issues
     if (player_ptr == NULL || enemy_ptr == NULL)
     {
-        return 4;
+        return BATTLE_ERROR;
     }
-
-    if (selection == 0)
-    {
-        battle_menu_draw(selection = 0);
-    }
-    else if (selection > 1)
-    {
-        battle_menu_draw(selection = 0);
-    }
-    else if(selection == 1)
-    {
-        battle_menu_draw(selection = 1);
-    }
-    else if (selection < 0)
-    {
-        battle_menu_draw(selection = 1);
-    }
-    
-
 
     //PLAYER TURN
-    if (current_turn == TURN_PLAYER && selection == 1 && lock == ENTER)
+    if (current_turn == TURN_PLAYER && selection == ATTACK && lock == ENTER)
     {
         // Player attacks enemy (dereferencing the pointer to modify values)
         enemy_ptr->current_hp -= player_ptr->attack_power;
@@ -65,16 +49,18 @@ int process_battle_turn(int init_mode, int selection, int lock)
         }
         if (enemy_ptr->current_hp == 0)
         {
-            return 1;
+            map_remove_enemy_at(enemy_y, enemy_x);
+            reset_stats();
+            return BATTLE_VICTORY;
         }
         
         current_turn = TURN_ENEMY; // Switch turn
     }
-    else if (current_turn == TURN_PLAYER && selection == 0 && lock == ENTER)
+    else if (current_turn == TURN_PLAYER && selection == RUN && lock == ENTER)
     {
         //temporary solution, will be implemented soon
         endwin();
-        return 1;
+        return BATTLE_VICTORY;
     }
     //ENEMY TURN
     else if (current_turn == TURN_ENEMY)
@@ -87,22 +73,28 @@ int process_battle_turn(int init_mode, int selection, int lock)
         }
         if (player_ptr->current_hp == 0)
         {
-            return 0;
+            reset_stats();
+            return BATTLE_DEFEAT;
         }
         
+
         current_turn = TURN_PLAYER; // Switch turn
     }
 
-    return 5;
+    return BATTLE_IN_PROGRESS;
 }
+
+
 void battle_init(void)
 {
     player = player_stats(player.max_hp, player.current_hp, player.attack_power);
     enemy = standard_enemy_stats(enemy.max_hp, enemy.current_hp, enemy.attack_power);
     turn_player current_turn = TURN_ENEMY;
     
-    process_battle_turn(0, 0, 0);
+    battle_result init = process_battle_turn(0, 0, 0, 0, 0);
 }
+
+
 //fills the battle array
 void battle_screen_init(void)
 {
@@ -122,8 +114,11 @@ void battle_screen_init(void)
     }
 }
 
-void battle_screen_draw()
+
+
+void battle_screen_draw(choice selection)
 {
+    //set the stage up
     for (int y = 0; y < BATTLE_SCREEN_HEIGHT; y++)
     {
         for (int x = 0; x < BATTLE_SCREEN_WIDTH; x++)
@@ -134,23 +129,44 @@ void battle_screen_draw()
 
     //Player set up
         //Player health bar
-    int current_health_player = health_bar_init(player.current_hp, player.max_hp);
-    draw_health_bar(current_health_player, player.max_hp);
+    int current_health_player = health_bar_init(player.current_hp, player.max_hp, 2);
+    draw_health_bar(current_health_player, player.max_hp, 2);
     standard_player_sprite();
 
     //Enemy set up
         //Enemy health bar
-    int current_health_enemy = health_bar_init(player.current_hp, player.max_hp);
-    draw_health_bar(current_health_player, player.max_hp);
+    int current_health_enemy = health_bar_init(enemy.current_hp, enemy.max_hp, 4);
+    draw_health_bar(current_health_enemy, enemy.max_hp, 4);
     standard_enemy_sprite();
+
+    //draw menu
+    if (selection == ATTACK)
+    {
+        battle_menu_draw(selection);
+    }
+    else if(selection == RUN)
+    {
+        battle_menu_draw(selection);
+    }
     
 }
 
-void battle_menu_draw(int selection)
+void battle_menu_draw(choice selection)
 {
-    if (selection == 0) mvprintw(15, 55, "> ATTACK");
+    if (selection == ATTACK) mvprintw(15, 55, "> ATTACK");
     else mvprintw(15, 55, "  ATTACK");
 
-    if (selection == 1) mvprintw(17, 55, "> RUN");
+    if (selection == RUN) mvprintw(17, 55, "> RUN");
     else mvprintw(17, 55, "  RUN");
+}
+
+void reset_stats(void)
+{
+    player.max_hp = 20;
+    player.current_hp = 20;
+    player.attack_power = 5;
+
+    enemy.max_hp = 20;
+    enemy.current_hp = 20;
+    enemy.attack_power = 3;
 }

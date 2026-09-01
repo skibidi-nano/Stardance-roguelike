@@ -1,0 +1,11 @@
+init an enemy for each 20 spaces on the current room
+every npc gets their own seed value for damage
+every init of an npc -> counter++
+if enemy is beaten counter-- && highscore++ -> draw over enemy
+if enemy counter == 0; -> doors work
+
+
+counter = roomsize / 20
+if (i < counter)
+counter--
+init npc.counter

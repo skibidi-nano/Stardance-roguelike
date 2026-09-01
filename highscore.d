@@ -1,0 +1,1 @@
+highscore.o: highscore.c

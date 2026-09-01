@@ -9,8 +9,8 @@ typedef struct
 } 
 entity;
 
-int health_bar_init(int current_hp, int max_hp);
+int health_bar_init(int current_hp, int max_hp, int y);
 
-void draw_health_bar(int health_bar, int max_hp);
+void draw_health_bar(int health_bar, int max_hp, int y);
 
 #endif

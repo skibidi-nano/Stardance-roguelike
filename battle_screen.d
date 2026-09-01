@@ -1,8 +1,9 @@
 battle_screen.o: battle_screen.c generation.h battle_screen.h config.h \
-  npc.h entity.h player.h
+  npc.h entity.h player.h map.h
 generation.h:
 battle_screen.h:
 config.h:
 npc.h:
 entity.h:
 player.h:
+map.h:

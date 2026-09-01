@@ -5,7 +5,7 @@
 static char menu[MENU_HEIGHT][MENU_WIDTH];
 
 
-
+//fill the menu array
 void menu_init(void)
 {
     for (int y = 0; y < MENU_HEIGHT; y++)
@@ -24,6 +24,7 @@ void menu_init(void)
     }
 }
 
+//draw the menu
 void menu_draw(void)
 {
     for (int y = 0; y < MENU_HEIGHT; y++)

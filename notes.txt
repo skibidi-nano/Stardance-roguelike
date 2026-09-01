@@ -1,0 +1,15 @@
+due:
+
+let frames update without key strokes
+fix junk values bug
+remove enemy after fight
+dynamic enemy generation
+enemy counter
+doors only work if enemy counter == 0
+
+"Bus function"
+
+done:
+
+reset stats after fight
+fix same damage bug (probably seed issues)

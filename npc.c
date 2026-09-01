@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <ncurses.h>
+#include <stdbool.h>
 #include "npc.h"
 #include "generation.h"
 #include "entity.h"
 
 
-npc npc_init(int map_width, int map_height)
+npc npc_init(int map_width, int map_height, int number, bool state)
 {
     npc enemy;
     
@@ -15,6 +16,12 @@ npc npc_init(int map_width, int map_height)
         enemy.npc_y = get_random_int(1, map_height - 2);
     } while (enemy.npc_x == 1 && enemy.npc_y == 1);
 
+    enemy.number = number;
+    enemy.active = state;
+
+    //dynamic variable names or something of same value
+
+    //what the fuck does that mean kobe bryant? (Keeping this because i am gen interested in what i meant with this)
     return enemy;
 }
 
