@@ -1,17 +1,55 @@
-/* void score_tracking(int current_run, location_score)
+#include "highscore.h"
+#include <stdio.h>
+
+static int current_score = 0;
+
+int score_tracking(int score_update)
 {
-    //function gets location of the current score, then  mainpulates the score in the main function
+    current_score += score_update;
+    return current_score;
+}
+void score_register(void)
+{
+    FILE *input = fopen("highscore.txt", "r+b");
+    if (input == NULL)
+    {
+        return;
+    }
+
+    int current_highscore = 0;
+    
+    if (fread(&current_highscore, sizeof(int), 1, input) != 1) 
+    {
+        current_highscore = 0; // default if file is empty
+    }
+
+    if (current_highscore < current_score)
+    {
+        current_highscore = current_score;
+        fseek(input, 0, SEEK_SET); 
+        fwrite(&current_highscore, sizeof(int), 1, input);
+    }
+
+    fclose(input);
+
 }
 
-void score_register(// input is the score of the current run)
+int get_highscore(void)
 {
-    //function checks if the new score is bigger than the recorded highscore, if so update highscore
-    //read from score and highscore.txt
-    //compare the values
-    //if score > highscore
-    //highscore = score
-    //close highscore.txt
-    //DONT FORGET MEMORY CHECKS
-}
+    FILE *input = fopen("highscore.txt", "r+b");
+    if (input == NULL)
+    {
+        return -1;
+    }
 
-*/
+    int current_highscore = 0;
+    
+    if (fread(&current_highscore, sizeof(int), 1, input) != 1) 
+    {
+        current_highscore = 0; // default if file is empty
+    }
+
+    fclose(input);
+
+    return current_highscore;
+}

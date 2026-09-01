@@ -12,6 +12,7 @@ static int enemy_counter = 0; //to know which npc has to be killed
 //initialisation of the map array
 void map_init(void)
 {
+    enemy_counter = 0;
 
     current_room = random_room_gen();
 

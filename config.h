@@ -30,3 +30,6 @@ typedef enum
 //For battle selection
 #define ENTER 10
 #endif
+
+//for highscore
+#define SCORE_FOR_DEFEATING_ENEMY 1

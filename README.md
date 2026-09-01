@@ -9,7 +9,7 @@ Key features of the game:
   - Enemies in the randomly generated rooms
   - A RPG inspired battle screen/system
   - Only leaving the room after beating every enemy
-  - (coming soon!) A highscore feature to track how many enemies you have beaten
+  - A highscore feature to track how many enemies you have beaten
   - (coming soon!) Power ups to make you stronger
   - (coming soon!) Stronger enemies and boss fights!
   - (coming soon!) Items to use in battle

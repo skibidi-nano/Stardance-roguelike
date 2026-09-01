@@ -1,2 +1,3 @@
-/*void score_tracking(int current_run, location_score);
-void score_register(// input is the score of the current run);*/
+int score_tracking(int score_update);
+void score_register(void);
+int get_highscore(void);

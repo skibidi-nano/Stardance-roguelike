@@ -1,6 +1,7 @@
+#include <ncurses.h>
 #include "menu.h"
 #include "config.h"
-#include <ncurses.h>
+#include "highscore.h"
 
 static char menu[MENU_HEIGHT][MENU_WIDTH];
 
@@ -35,7 +36,8 @@ void menu_draw(void)
         }
     }
 
-    mvprintw(2, 13, "CURRENT HIGHSCORE: PLACEHOLDER");
+    int highscore = get_highscore();
+    mvprintw(2, 13, "CURRENT HIGHSCORE: %i", highscore);
     mvprintw(4, 19, "[1] START GAME");
     mvprintw(6, 19, "[q] QUIT GAME");
 

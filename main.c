@@ -1,9 +1,11 @@
 #include <ncurses.h>
 #include <stdlib.h>
+#include <time.h>
 #include "menu.h"
 #include "map.h"
 #include "battle_screen.h"
 #include "config.h"
+#include "highscore.h"
 
 void map_refresh(int player_y, int player_x);
 void handle_menu_input(int user_input);
@@ -17,11 +19,15 @@ int handle_battle_input(int user_input);
     int next_y = 0;
     int next_x = 0;
     int target_enemy_y, target_enemy_x;
+    int score = 0;
 
 gamestate current_gamestate = STATE_MENU;
 
 int main(void)
 {
+
+    srand(time(NULL));
+
     //setup for screen/ncurses
     initscr();
     cbreak();
@@ -91,7 +97,13 @@ void handle_menu_input(int user_input)
     menu_init();
     switch(user_input) 
     {
-                case '1': current_gamestate = STATE_MAP; break;
+                case '1': 
+                    map_init();       // generate a new room
+                    reset_stats();    // reset player hp
+                    player_y = 1;     // reset player position
+                    player_x = 1;
+                    current_gamestate = STATE_MAP; 
+                    break;
     }
 }
 
@@ -158,12 +170,12 @@ int handle_battle_input(int user_input)
     lock = 0;
     if (outcome == BATTLE_VICTORY)
     {
+        score = score_tracking(SCORE_FOR_DEFEATING_ENEMY);
         current_gamestate = STATE_MAP;
     }
     else if (outcome == BATTLE_DEFEAT)
     {
-        //need to add highscore/score function
-        //need to add sleep function
+        score_register();
         current_gamestate = STATE_MENU;
     }
 
