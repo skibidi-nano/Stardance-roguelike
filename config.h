@@ -6,7 +6,8 @@ typedef enum
 {
     STATE_MAP,
     STATE_BATTLE,
-    STATE_MENU //coming soon!!!
+    STATE_MENU,
+    STATE_ITEM
 } gamestate;
 
 
@@ -24,8 +25,15 @@ typedef enum
 #define BATTLE_SCREEN_WIDTH 80
 #define BATTLE_SCREEN_HEIGHT 20
 
+//For item screen gen
+#define ITEM_SCREEN_WIDTH 80
+#define ITEM_SCREEN_HEIGHT 20
+
 //For npc creation
 #define MAX_NUMBER_OF_NPCS 8
+
+//For item creation
+#define MAX_NUMBER_OF_ITEMS 4
 
 //For battle selection
 #define ENTER 10
@@ -33,3 +41,6 @@ typedef enum
 
 //for highscore
 #define SCORE_FOR_DEFEATING_ENEMY 1
+
+//for item position
+#define ITEM_POS_Y 30

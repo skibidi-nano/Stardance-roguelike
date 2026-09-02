@@ -17,6 +17,7 @@ typedef enum
 typedef enum
 {
     ATTACK,
+    ITEM,
     RUN
 } choice;
 

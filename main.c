@@ -6,11 +6,13 @@
 #include "battle_screen.h"
 #include "config.h"
 #include "highscore.h"
+#include "item.h"
 
 void map_refresh(int player_y, int player_x);
 void handle_menu_input(int user_input);
 void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
+items current_item;
 
 //player starting position (prob will be changed)
     int player_y = 1;
@@ -58,6 +60,10 @@ int main(void)
 
             case STATE_BATTLE:
                 selection = handle_battle_input(user_input);
+                break;
+
+            case STATE_ITEM:
+                init_item_screen();
         }
 
         clear();
@@ -74,6 +80,10 @@ int main(void)
 
             case STATE_BATTLE:
                 battle_screen_draw(selection);
+                break;
+
+            case STATE_ITEM:
+                draw_item_screen(current_item);
         }
 
         refresh();
@@ -136,6 +146,12 @@ void handle_map_input(int user_input)
         target_enemy_y = next_y;
         target_enemy_x = next_x;
     }
+    //player-item collision check
+    else if(map_is_item(next_y, next_x))
+    {
+        current_gamestate = STATE_ITEM;
+        current_item = random_item();
+    }
     //wall collision check
     else if (!map_is_wall(next_y, next_x))
     {
@@ -154,14 +170,16 @@ int handle_battle_input(int user_input)
     {    
         battle_screen_init();
         battle_init();
+        score = 0; //reset score
         battle_check++;
     }
 
     //check for user input
     switch(user_input) 
     {
-        case 'w': selection = ATTACK; break;
-        case 's': selection = RUN; break;
+        case '1': selection = ATTACK; break;
+        case '2': selection = ITEM; break;
+        case '3': selection = RUN; break;
         case ENTER : lock = ENTER; break;
     }
     

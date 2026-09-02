@@ -10,4 +10,3 @@ typedef struct
 
 room random_room_gen(void);
 int get_random_int(int min, int max);
-
