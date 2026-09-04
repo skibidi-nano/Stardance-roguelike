@@ -9,15 +9,11 @@ static room current_room;
 static npc room_enemies[MAX_NUMBER_OF_NPCS]; 
 static int enemy_counter = 0; //to know which npc has to be killed
 static item room_items[MAX_NUMBER_OF_ITEMS];
-static int item_counter = 0; //to know which item has to be removed (items behave very similarly to entities)
-
 
 //initialisation of the map array
 void map_init(void)
 {
     enemy_counter = 0;
-
-    item_counter = 0;
 
     current_room = random_room_gen();
 
@@ -34,7 +30,6 @@ void map_init(void)
     for (int i = 0; i < item_amnt; i++)
     {
         room_items[i] = item_init(current_room.width, current_room.height, i, TRUE, room_enemies, enemy_amnt);
-        item_counter++;
     }
 
     for (int y = 0; y < current_room.height; y++)
@@ -138,6 +133,21 @@ void map_remove_enemy_at(int y, int x)
         {
             room_enemies[i].active = FALSE;
             enemy_counter--; // Decrement counter for door logic
+            break;
+        }
+    }
+}
+
+void map_remove_item_at(int y, int x) 
+{
+    map[y][x] = '.'; // Remove enemy
+    
+    // Find the NPC in our list to mark as inactive
+    for (int i = 0; i < MAX_NUMBER_OF_ITEMS; i++) 
+    {
+        if (room_items[i].item_y == y && room_items[i].item_x == x) 
+        {
+            room_items[i].active = FALSE;
             break;
         }
     }

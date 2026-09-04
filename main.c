@@ -7,27 +7,39 @@
 #include "config.h"
 #include "highscore.h"
 #include "item.h"
+#include "inventory.h"
 
 void map_refresh(int player_y, int player_x);
 void handle_menu_input(int user_input);
 void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
-items current_item;
+void handle_item_input(int user_input);
+int handle_inventory_input(int user_input);
+
 
 //player starting position (prob will be changed)
-    int player_y = 1;
-    int player_x = 1;
-    int battle_check = 0;
-    int next_y = 0;
-    int next_x = 0;
-    int target_enemy_y, target_enemy_x;
-    int score = 0;
+int player_y = 1;
+int player_x = 1;
+int next_y = 0;
+int next_x = 0;
+int target_enemy_y;
+int target_enemy_x;
+int target_item_y;
+int target_item_x;
+
+
+int battle_check = 0;
+int score = 0;
+
+int inventory_track = 0;
+items current_item;
+items inventory[INVENTORY_SIZE];
 
 gamestate current_gamestate = STATE_MENU;
 
 int main(void)
 {
-
+    //for random map gen
     srand(time(NULL));
 
     //setup for screen/ncurses
@@ -41,6 +53,11 @@ int main(void)
     //first menu init
     menu_init();
     menu_draw();
+
+    for (int i = 0; i < INVENTORY_SIZE; i++)
+    {
+        inventory[i] = EMPTY;
+    }
 
     //main loop
     int user_input;
@@ -63,7 +80,11 @@ int main(void)
                 break;
 
             case STATE_ITEM:
-                init_item_screen();
+                handle_item_input(user_input);
+                break;
+            case STATE_INVENTORY:
+                selection = handle_inventory_input(user_input);
+
         }
 
         clear();
@@ -83,7 +104,11 @@ int main(void)
                 break;
 
             case STATE_ITEM:
-                draw_item_screen(current_item);
+                item_screen_draw(current_item);
+                break;
+
+            case STATE_INVENTORY:
+                inventory_screen_draw(selection, inventory);
         }
 
         refresh();
@@ -149,8 +174,10 @@ void handle_map_input(int user_input)
     //player-item collision check
     else if(map_is_item(next_y, next_x))
     {
+        target_item_y = next_y;
+        target_item_x = next_x;
+        current_item = random_item(); //generate item every time a player collides with an item
         current_gamestate = STATE_ITEM;
-        current_item = random_item();
     }
     //wall collision check
     else if (!map_is_wall(next_y, next_x))
@@ -183,6 +210,11 @@ int handle_battle_input(int user_input)
         case ENTER : lock = ENTER; break;
     }
     
+    if(selection == ITEM)
+    {
+        current_gamestate = STATE_INVENTORY;
+        return selection;
+    }
     static battle_result outcome = BATTLE_IN_PROGRESS;
     outcome = process_battle_turn(battle_check, selection, lock, target_enemy_x, target_enemy_y);
     lock = 0;
@@ -196,6 +228,84 @@ int handle_battle_input(int user_input)
         score_register();
         current_gamestate = STATE_MENU;
     }
+
+    return selection;
+}
+
+void handle_item_input(int user_input)
+{
+
+    //edge case: more than 10 items: check if items in inventory = 10 if so give option to return to map (overall i should add this)
+    int lock = 0;
+    int *heal_manipulator = NULL;
+    int *max_hp_manipulator = NULL;
+    int *max_strength_manipulator = NULL;
+
+    init_item_screen();
+
+    switch(user_input)
+    {
+        case ENTER : lock = ENTER; break;
+        case ESC : lock = ESC;
+    }
+    if (lock == ENTER)
+    {
+        switch (current_item)
+        {
+            case HEAL:
+                    inventory[inventory_track] = current_item;
+                    inventory_track++;
+                    break;
+
+            case EXTRA_STRENGTH: 
+                    max_strength_manipulator = get_location_of(EXTRA_STRENGTH);
+                    *max_strength_manipulator += EXTRA_STRENGTH_AMOUNT; 
+                    break;
+
+            case EXTRA_HP: 
+                    max_hp_manipulator = get_location_of(EXTRA_HP);
+                    *max_hp_manipulator += EXTRA_HP_AMOUNT;
+                    break;
+            case EMPTY:
+                    break;
+        }
+
+        map_remove_item_at(target_item_y, target_item_x);
+
+        current_gamestate = STATE_MAP;
+    }
+    else if (lock == ESC)
+    {
+        map_remove_item_at(target_item_y, target_item_x);
+
+        current_gamestate = STATE_MAP;
+    }
+
+    
+}
+
+int handle_inventory_input(int user_input)
+{
+    static int selection = 0;
+    //int lock = 0;
+    
+    switch(user_input) 
+    {
+        case 'd': selection++; break;
+        case 'a': selection--; break;
+        //case ENTER : lock = ENTER; break;
+    }
+
+    if (selection < 0)
+    {
+        selection = INVENTORY_SIZE - 1;
+    }
+    else if (selection > INVENTORY_SIZE)
+    {
+        selection = 0;
+    }
+
+    init_inventory_screen();
 
     return selection;
 }

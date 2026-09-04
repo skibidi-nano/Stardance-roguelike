@@ -15,4 +15,6 @@ int map_is_item(int y, int x);
 npc* position_of_enemy_array(void);
 
 void map_remove_enemy_at(int y, int x);
+
+void map_remove_item_at(int y, int x);
 #endif

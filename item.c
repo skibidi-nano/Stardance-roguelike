@@ -1,5 +1,5 @@
 #include <ncurses.h>
-#include <string.h> // Für memset
+#include <string.h>
 #include "item.h"
 #include "config.h"
 #include "npc.h"
@@ -12,20 +12,22 @@ item item_init(int map_width, int map_height, int number, bool state, npc enemy[
     item floor_item;
     bool valid_position;
 
-    // Collisioncheck for starting position and enemy position
+    // collision check for starting position and enemy position
     do {
         valid_position = true;
         floor_item.item_x = get_random_int(1, map_width - 2);
         floor_item.item_y = get_random_int(1, map_height - 2);
 
-        // Block the starting position
-        if (floor_item.item_x == 1 && floor_item.item_y == 1) {
+        // block the starting position
+        if (floor_item.item_x == 1 && floor_item.item_y == 1) 
+        {
             valid_position = false;
             continue;
         }
 
-        // Check if item position is the same as enemy position
-        for (int i = 0; i < enemy_amnt; i++) {
+        // check if item position is the same as enemy position
+        for (int i = 0; i < enemy_amnt; i++) 
+        {
             if (floor_item.item_x == enemy[i].npc_x && floor_item.item_y == enemy[i].npc_y) {
                 valid_position = false;
                 break;
@@ -67,10 +69,10 @@ items random_item(void)
 
 void init_item_screen(void)
 {
-    memset(item_screen, '/', sizeof(item_screen));
+    memset(item_screen, ' ', sizeof(item_screen));
 }
 
-void draw_item_screen(items item)
+void item_screen_draw(items item)
 {
     for (int y = 0; y < ITEM_SCREEN_HEIGHT; y++)
     {
@@ -81,16 +83,23 @@ void draw_item_screen(items item)
     {
         case HEAL:
             heal_sprite();
+            mvaddnstr(2, 31, "YOU'VE GOT A HEALING POTION", -1);
             break;
         case EXTRA_STRENGTH:
             extra_strength_sprite();
+            mvaddnstr(2, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
             break;
         case EXTRA_HP:
             extra_hp_sprite();
+            mvaddnstr(2, 31, "YOU'VE GOT AN EXTRA HP ENCHANTMENT", -1);
             break;
         default:
             break;
     }
+
+    mvaddnstr(18, 31, "PRESS \"ESCAPE\" TO RETURN", -1);
+
+    mvaddnstr(19, 31, "PRESS \"ENTER\" TO PICK UP", -1);
 }
 
 void heal_sprite(void)

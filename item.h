@@ -1,3 +1,6 @@
+#ifndef ITEM_H
+#define ITEM_H
+
 #include <stdbool.h>
 #include "config.h"
 #include "npc.h"
@@ -17,6 +20,7 @@ typedef enum
     HEAL,
     EXTRA_STRENGTH,
     EXTRA_HP,
+    EMPTY
 }
 items;
 
@@ -25,8 +29,10 @@ int items_per_room(int room_width, int room_height);
 items random_item(void);
 
 void init_item_screen(void);
-void draw_item_screen(items item);
+void item_screen_draw(items item);
 
 void heal_sprite(void);
 void extra_hp_sprite(void);
 void extra_strength_sprite(void);
+
+#endif

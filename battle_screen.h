@@ -1,3 +1,5 @@
+#include "item.h"
+
 typedef enum
 {
     TURN_PLAYER,
@@ -26,4 +28,6 @@ void battle_init(void);
 void battle_screen_init(void);
 void battle_screen_draw(choice selection);
 void battle_menu_draw(choice selection);
+
+int* get_location_of(items item);
 void reset_stats(void);

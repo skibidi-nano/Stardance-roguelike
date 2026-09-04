@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "entity.h"
+
 typedef struct
 {
     int max_hp;
@@ -9,7 +11,7 @@ typedef struct
 } 
 entity;
 
-int health_bar_init(int current_hp, int max_hp, int y);
+int health_bar_init(int current_hp, int max_hp);
 
 void draw_health_bar(int health_bar, int max_hp, int y);
 

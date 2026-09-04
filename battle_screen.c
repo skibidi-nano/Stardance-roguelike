@@ -7,8 +7,12 @@
 #include "entity.h"
 #include "map.h"
 #include "npc.h"
+#include "item.h"
 
 static char battle_screen[BATTLE_SCREEN_HEIGHT][BATTLE_SCREEN_WIDTH];
+static int max_hp = 20;
+static int current_hp = 20;
+static int attack_power = 5;
 
 // initial stats entity
 static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
@@ -129,14 +133,14 @@ void battle_screen_draw(choice selection)
 
     //Player set up
         //Player health bar
-    int current_health_player = health_bar_init(player.current_hp, player.max_hp, 2);
-    draw_health_bar(current_health_player, player.max_hp, 2);
+    int current_health_player = health_bar_init(player.current_hp, player.max_hp);
+    draw_health_bar(current_health_player, player.max_hp, HEALTH_BAR_POSITION_PLAYER);
     standard_player_sprite();
 
     //Enemy set up
         //Enemy health bar
-    int current_health_enemy = health_bar_init(enemy.current_hp, enemy.max_hp, 4);
-    draw_health_bar(current_health_enemy, enemy.max_hp, 4);
+    int current_health_enemy = health_bar_init(enemy.current_hp, enemy.max_hp);
+    draw_health_bar(current_health_enemy, enemy.max_hp, HEALTH_BAR_POSITION_ENEMY);
     standard_enemy_sprite();
 
     //draw menu
@@ -160,11 +164,22 @@ void battle_menu_draw(choice selection)
     else mvprintw(17, 55, "  RUN");
 }
 
+int* get_location_of(items item)
+{
+    switch (item)
+    {
+        case HEAL: return &current_hp;
+        case EXTRA_STRENGTH: return &attack_power;
+        case EXTRA_HP: return &max_hp;
+        default: return NULL;
+    }
+}
+
 void reset_stats(void)
 {
-    player.max_hp = 20;
-    player.current_hp = 20;
-    player.attack_power = 5;
+    player.max_hp = max_hp;
+    player.current_hp = 20; 
+    player.attack_power = attack_power;
 
     enemy.max_hp = 20;
     enemy.current_hp = 20;

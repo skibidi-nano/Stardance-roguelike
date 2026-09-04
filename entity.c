@@ -2,9 +2,9 @@
 #include "config.h"
 #include "entity.h"
 
-int health_bar_init(int current_hp, int max_hp, int y)
+int health_bar_init(int current_hp, int max_hp)
 {
-    return (current_hp * max_hp) / max_hp;
+    return (current_hp * 20) / max_hp;
 }
 
 void draw_health_bar(int health_bar, int max_hp, int y)
