@@ -15,6 +15,7 @@ void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
 void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
+void reset_inventory(void);
 
 
 //player starting position (prob will be changed)
@@ -54,10 +55,7 @@ int main(void)
     menu_init();
     menu_draw();
 
-    for (int i = 0; i < INVENTORY_SIZE; i++)
-    {
-        inventory[i] = EMPTY;
-    }
+    reset_inventory();
 
     //main loop
     int user_input;
@@ -205,19 +203,22 @@ int handle_battle_input(int user_input)
     switch(user_input) 
     {
         case '1': selection = ATTACK; break;
-        case '2': selection = ITEM; break;
+        case '2': selection = INVENTORY; break;
         case '3': selection = RUN; break;
         case ENTER : lock = ENTER; break;
     }
     
-    if(selection == ITEM)
+    if (selection == INVENTORY && lock == ENTER)
     {
         current_gamestate = STATE_INVENTORY;
         return selection;
     }
+
     static battle_result outcome = BATTLE_IN_PROGRESS;
     outcome = process_battle_turn(battle_check, selection, lock, target_enemy_x, target_enemy_y);
+
     lock = 0;
+
     if (outcome == BATTLE_VICTORY)
     {
         score = score_tracking(SCORE_FOR_DEFEATING_ENEMY);
@@ -226,6 +227,7 @@ int handle_battle_input(int user_input)
     else if (outcome == BATTLE_DEFEAT)
     {
         score_register();
+        reset_inventory();
         current_gamestate = STATE_MENU;
     }
 
@@ -237,7 +239,6 @@ void handle_item_input(int user_input)
 
     //edge case: more than 10 items: check if items in inventory = 10 if so give option to return to map (overall i should add this)
     int lock = 0;
-    int *heal_manipulator = NULL;
     int *max_hp_manipulator = NULL;
     int *max_strength_manipulator = NULL;
 
@@ -253,18 +254,24 @@ void handle_item_input(int user_input)
         switch (current_item)
         {
             case HEAL:
-                    inventory[inventory_track] = current_item;
-                    inventory_track++;
-                    break;
+                        inventory[inventory_track] = current_item;
+                        inventory_track++;
+                        if (inventory_track == 10)
+                        {
+                            inventory_track = 0;
+                        }
+                        break;
 
             case EXTRA_STRENGTH: 
                     max_strength_manipulator = get_location_of(EXTRA_STRENGTH);
-                    *max_strength_manipulator += EXTRA_STRENGTH_AMOUNT; 
+                    *max_strength_manipulator += EXTRA_STRENGTH_AMOUNT;
+                    reset_stats();
                     break;
 
             case EXTRA_HP: 
                     max_hp_manipulator = get_location_of(EXTRA_HP);
                     *max_hp_manipulator += EXTRA_HP_AMOUNT;
+                    reset_stats();
                     break;
             case EMPTY:
                     break;
@@ -287,13 +294,16 @@ void handle_item_input(int user_input)
 int handle_inventory_input(int user_input)
 {
     static int selection = 0;
-    //int lock = 0;
+    int lock = 0;
+    int *heal_manipulator = NULL;
+    int *max_hp_ptr = NULL;
     
     switch(user_input) 
     {
         case 'd': selection++; break;
         case 'a': selection--; break;
-        //case ENTER : lock = ENTER; break;
+        case ENTER: lock = ENTER; break;
+        case ESC: lock = ESC; break;
     }
 
     if (selection < 0)
@@ -305,7 +315,43 @@ int handle_inventory_input(int user_input)
         selection = 0;
     }
 
+    if (lock == ENTER && inventory[selection] != EMPTY)
+    {
+        switch (inventory[selection])
+        {
+            case HEAL : 
+                max_hp_ptr = get_location_of(EXTRA_HP);
+                heal_manipulator = get_location_of(HEAL);
+                if (*heal_manipulator + HEALING_AMOUNT > *max_hp_ptr)
+                {
+                    *heal_manipulator = *max_hp_ptr;
+                }
+                else
+                {
+                *heal_manipulator += HEALING_AMOUNT;
+                }
+                inventory[selection] = EMPTY;
+                break;
+            case EMPTY : break;
+            case EXTRA_HP : break;
+            case EXTRA_STRENGTH : break;
+        }
+        current_gamestate = STATE_BATTLE;
+    }
+    else if (lock == ESC)
+    {
+        current_gamestate = STATE_BATTLE;
+    }
+
     init_inventory_screen();
 
     return selection;
+}
+
+void reset_inventory(void)
+{
+    for (int i = 0; i < INVENTORY_SIZE; i++)
+    {
+        inventory[i] = EMPTY;
+    }
 }

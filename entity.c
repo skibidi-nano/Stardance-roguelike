@@ -2,16 +2,11 @@
 #include "config.h"
 #include "entity.h"
 
-int health_bar_init(int current_hp, int max_hp)
-{
-    return (current_hp * 20) / max_hp;
-}
-
-void draw_health_bar(int health_bar, int max_hp, int y)
+void draw_health_bar(int current_hp, int max_hp, int y)
 {
     for (int i = 0; i < max_hp; i++)
     {
-       if (i < health_bar)
+       if (i < current_hp)
        {
             mvprintw(y, 2 + i, "+");
        }
@@ -22,3 +17,15 @@ void draw_health_bar(int health_bar, int max_hp, int y)
     }
 }
 
+
+void draw_current_hp(int current_hp, int y)
+{
+    mvprintw(y, 2, "#HP");
+    mvprintw(y, 7, "%i", current_hp);
+}
+
+void draw_current_strength(int current_strength, int y)
+{
+    mvprintw(y, 13, "#ATK");
+    mvprintw(y, 18, "%i", current_strength);
+}

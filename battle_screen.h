@@ -19,7 +19,7 @@ typedef enum
 typedef enum
 {
     ATTACK,
-    ITEM,
+    INVENTORY,
     RUN
 } choice;
 

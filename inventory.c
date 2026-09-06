@@ -70,6 +70,7 @@ void print_frame_select(items item, int position_y, int position_x)
         mvprintw(position_y,  position_x, "++++++");
         mvprintw(position_y + 1,  position_x, "+ <3 + <<<");
         mvprintw(position_y + 2,  position_x, "++++++");
+        mvprintw(5, 50, "HEALS YOU FOR 5 HP");
     }
     else
     {
@@ -86,11 +87,13 @@ void print_frame_not_select(items item, int position_y, int position_x)
         mvprintw(position_y,  position_x, "++++++");
         mvprintw(position_y + 1,  position_x, "+ <3 +");
         mvprintw(position_y + 2,  position_x, "++++++");
+        mvprintw(5, 50, "HEALS YOU FOR 5 HP");
+
     }
     else
     {
         mvprintw(position_y,  position_x , "++++++");
-        mvprintw(position_y + 1,  position_x + 1, "+    +");
+        mvprintw(position_y + 1,  position_x, "+    +");
         mvprintw(position_y + 2,  position_x, "++++++");
     }
 }

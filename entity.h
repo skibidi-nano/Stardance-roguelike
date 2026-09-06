@@ -11,8 +11,9 @@ typedef struct
 } 
 entity;
 
-int health_bar_init(int current_hp, int max_hp);
+void draw_health_bar(int current_hp, int max_hp, int y);
 
-void draw_health_bar(int health_bar, int max_hp, int y);
+void draw_current_strength(int current_strength, int y);
+void draw_current_hp(int current_hp, int y);
 
 #endif

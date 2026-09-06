@@ -34,5 +34,4 @@ void item_screen_draw(items item);
 void heal_sprite(void);
 void extra_hp_sprite(void);
 void extra_strength_sprite(void);
-
 #endif

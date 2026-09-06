@@ -133,18 +133,37 @@ void battle_screen_draw(choice selection)
 
     //Player set up
         //Player health bar
-    int current_health_player = health_bar_init(player.current_hp, player.max_hp);
-    draw_health_bar(current_health_player, player.max_hp, HEALTH_BAR_POSITION_PLAYER);
+
+    draw_health_bar(player.current_hp, player.max_hp, HEALTH_BAR_POSITION_PLAYER);
+
+    draw_current_hp(player.current_hp, HEALTH_BAR_POSITION_PLAYER + 1);
+
+    draw_current_strength(player.attack_power, HEALTH_BAR_POSITION_PLAYER + 1);
+
     standard_player_sprite();
+
+
 
     //Enemy set up
         //Enemy health bar
-    int current_health_enemy = health_bar_init(enemy.current_hp, enemy.max_hp);
-    draw_health_bar(current_health_enemy, enemy.max_hp, HEALTH_BAR_POSITION_ENEMY);
+
+        //i think the health bar function has become obsolete
+
+    draw_health_bar(enemy.current_hp, enemy.max_hp, HEALTH_BAR_POSITION_ENEMY);
+
+    draw_current_hp(enemy.current_hp, HEALTH_BAR_POSITION_ENEMY + 1);
+
+    draw_current_strength(enemy.attack_power, HEALTH_BAR_POSITION_ENEMY + 1);
+
     standard_enemy_sprite();
+
 
     //draw menu
     if (selection == ATTACK)
+    {
+        battle_menu_draw(selection);
+    }
+    else if(selection == INVENTORY)
     {
         battle_menu_draw(selection);
     }
@@ -157,18 +176,21 @@ void battle_screen_draw(choice selection)
 
 void battle_menu_draw(choice selection)
 {
-    if (selection == ATTACK) mvprintw(15, 55, "> ATTACK");
-    else mvprintw(15, 55, "  ATTACK");
+    if (selection == ATTACK) mvprintw(13, 55, " > [1] ATTACK");
+    else mvprintw(13, 55, " [1] ATTACK");
 
-    if (selection == RUN) mvprintw(17, 55, "> RUN");
-    else mvprintw(17, 55, "  RUN");
+    if (selection == INVENTORY) mvprintw(15, 55, " > [2] INVENTORY");
+    else mvprintw(15, 55, " [2] INVENTORY");
+
+    if (selection == RUN) mvprintw(17, 55, " > [3] RUN");
+    else mvprintw(17, 55, " [3] RUN");
 }
 
-int* get_location_of(items item)
+int* get_location_of(items item) //need to rewrite    ps:not sure tho probably just a name change
 {
     switch (item)
     {
-        case HEAL: return &current_hp;
+        case HEAL: return &player.current_hp;
         case EXTRA_STRENGTH: return &attack_power;
         case EXTRA_HP: return &max_hp;
         default: return NULL;
@@ -178,7 +200,7 @@ int* get_location_of(items item)
 void reset_stats(void)
 {
     player.max_hp = max_hp;
-    player.current_hp = 20; 
+    player.current_hp = player.max_hp; 
     player.attack_power = attack_power;
 
     enemy.max_hp = 20;

@@ -40,7 +40,7 @@ typedef enum
 //For item creation
 #define MAX_NUMBER_OF_ITEMS 4
 
-//For battle selection
+//For selection
 #define ENTER 10
 #define ESC 27
 
@@ -53,12 +53,12 @@ typedef enum
 //for items in main loop
 #define INVENTORY_SIZE 10
 #define MAXIMUM_ITEMS 5
-#define EXTRA_STRENGTH_AMOUNT 5
-#define EXTRA_HP_AMOUNT 3
+#define EXTRA_STRENGTH_AMOUNT 1
+#define EXTRA_HP_AMOUNT 2
 #define HEALING_AMOUNT 5
 
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2
-#define HEALTH_BAR_POSITION_ENEMY 4
+#define HEALTH_BAR_POSITION_ENEMY 5
 
 #endif
