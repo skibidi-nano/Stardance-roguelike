@@ -3,11 +3,19 @@
 
 #include "entity.h"
 
+typedef enum 
+{
+    ADDRESS,
+    MODULO,
+}
+type;
+
 typedef struct
 {
     int max_hp;
     int current_hp;
     int attack_power;
+    int type;
 } 
 entity;
 

@@ -1,18 +1,23 @@
 #include <ncurses.h>
+#include <stdlib.h>
 #include "map.h"
 #include "generation.h"
 #include "npc.h"
 #include "item.h"
+
 
 static char map[MAX_HEIGHT][MAX_WIDTH];
 static room current_room;
 static npc room_enemies[MAX_NUMBER_OF_NPCS]; 
 static int enemy_counter = 0; //to know which npc has to be killed
 static item room_items[MAX_NUMBER_OF_ITEMS];
+static int room_counter = 0;
 
 //initialisation of the map array
 void map_init(void)
 {
+    int decide_enemies = 0;
+    room_counter++;
     enemy_counter = 0;
 
     current_room = random_room_gen();
@@ -52,7 +57,16 @@ void map_init(void)
             {
                 if (y == room_enemies[i].npc_y && x == room_enemies[i].npc_x && room_enemies[i].active == TRUE)
                 {
-                    map[y][x] = '&'; //enemie symbol (evil pointer)
+                    decide_enemies = get_random_int(1, enemy_amnt);
+                    if (decide_enemies > 2)
+                    {
+                        map[y][x] = '%'; //enemie symbol (alt enemy)
+                    }
+                    else
+                    {
+                            map[y][x] = '&'; //enemie symbol (evil pointer)
+                    }
+
                 }
             }
             for (int i = 0; i < item_amnt; i++)
@@ -74,6 +88,10 @@ void map_draw(void)
         for (int x = 0; x < current_room.width; x++)
         {
             mvaddch(y, x, map[y][x]);
+            if (x == current_room.width && y == current_room.height)
+            {
+                break;
+            }
         }
     }
 }
@@ -104,15 +122,19 @@ int map_is_enemy(int y, int x)
     {
         return 0;
     }
-    return map[y][x] == '&';
+    else if (map[y][x] == '&' || map[y][x] == '%')
+    {
+        return 1;
+    }
+    return 0;
 }
 
 int map_is_item(int y, int x)
 {
-    //everything outside of the map is treated as a wall
+    
     if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
     {
-        return 1;
+        return 0; //change to 1 for debug mode (when going through doors that shouldnt be able to get access, you get items)
     }
     return map[y][x] == '+';
 }
@@ -120,6 +142,11 @@ int map_is_item(int y, int x)
 npc* position_of_enemy_array(void)
 {
     return room_enemies;
+}
+
+char value_of_part_of_map(int y, int x)
+{
+    return map[y][x];
 }
 
 void map_remove_enemy_at(int y, int x) 

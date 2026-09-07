@@ -37,7 +37,7 @@ entity standard_enemy_stats(int max, int current, int power)
 }
 
 
-void standard_enemy_sprite(void)
+void address_enemy_sprite(void)
 {
     //main enemy (pointer sprite)
     mvprintw(2, 59, "\\  |  /");
@@ -45,4 +45,13 @@ void standard_enemy_sprite(void)
     mvprintw(4, 57, "---- * ----");
     mvprintw(5, 60, "/ | \\");
     mvprintw(6, 59, "/  |  \\"); 
+}
+
+void modulo_enemy_sprite(void)
+{
+    mvprintw(2, 59, "(o)   //");
+    mvprintw(3, 59, "     // ");
+    mvprintw(4, 59, "    //  ");
+    mvprintw(5, 59, "   //   ");
+    mvprintw(6, 59, "  //    (o)");
 }

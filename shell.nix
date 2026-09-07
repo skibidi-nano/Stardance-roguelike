@@ -7,5 +7,6 @@ pkgs.mkShell {
     gdb         
     gnumake
     ncurses   
+    valgrind
   ];
 }

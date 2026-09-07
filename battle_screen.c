@@ -14,9 +14,11 @@ static int max_hp = 20;
 static int current_hp = 20;
 static int attack_power = 5;
 
+static char enemy_type;
+
 // initial stats entity
 static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
-static entity enemy  = { .max_hp = 20, .current_hp = 20, .attack_power = 3 };
+static entity enemy;  
 //sets the stats for the entities that are fighting
 
 battle_result process_battle_turn(int init_mode, choice selection, int lock, int enemy_x, int enemy_y)
@@ -30,7 +32,13 @@ battle_result process_battle_turn(int init_mode, choice selection, int lock, int
     //gets called one to set up the entities
     if (init_mode == 0)
     {
-        player_ptr = &player;
+        enemy_type = value_of_part_of_map(enemy_y, enemy_x);
+        switch (enemy_type)
+        {
+            case '&': enemy = stats_enemy(ADDRESS); break;
+            case '%': enemy = stats_enemy(MODULO); break;
+        }
+        player_ptr = &player; 
         enemy_ptr = &enemy;
         current_turn = TURN_PLAYER; //default starting turn is player
         return BATTLE_SETUP;
@@ -89,13 +97,12 @@ battle_result process_battle_turn(int init_mode, choice selection, int lock, int
 }
 
 
-void battle_init(void)
+void battle_init(int enemy_y, int enemy_x)
 {
+
     player = player_stats(player.max_hp, player.current_hp, player.attack_power);
-    enemy = standard_enemy_stats(enemy.max_hp, enemy.current_hp, enemy.attack_power);
-    turn_player current_turn = TURN_ENEMY;
     
-    battle_result init = process_battle_turn(0, 0, 0, 0, 0);
+    battle_result init = process_battle_turn(0, 0, 0, enemy_x, enemy_y);
 }
 
 
@@ -144,10 +151,9 @@ void battle_screen_draw(choice selection)
 
 
 
+
     //Enemy set up
         //Enemy health bar
-
-        //i think the health bar function has become obsolete
 
     draw_health_bar(enemy.current_hp, enemy.max_hp, HEALTH_BAR_POSITION_ENEMY);
 
@@ -155,7 +161,12 @@ void battle_screen_draw(choice selection)
 
     draw_current_strength(enemy.attack_power, HEALTH_BAR_POSITION_ENEMY + 1);
 
-    standard_enemy_sprite();
+    switch (enemy_type)
+    {
+        case '&': address_enemy_sprite(); break;
+        case '%': modulo_enemy_sprite(); break;
+    }
+    
 
 
     //draw menu
@@ -206,4 +217,27 @@ void reset_stats(void)
     enemy.max_hp = 20;
     enemy.current_hp = 20;
     enemy.attack_power = 3;
+}
+
+entity stats_enemy(type type)
+{
+    entity current_enemy;
+    switch (type)
+    {
+        case ADDRESS: //stats for standard enemies
+            current_enemy.max_hp = 20;
+            current_enemy.current_hp = current_enemy.max_hp;
+            current_enemy.attack_power = 3;
+            current_enemy.type = ADDRESS;
+            break;
+        case MODULO: //stats for special enemies
+            current_enemy.max_hp = 15;
+            current_enemy.current_hp = current_enemy.max_hp;
+            current_enemy.attack_power = 4;
+            current_enemy.type = MODULO;
+            break;
+
+    }
+
+    return current_enemy;
 }

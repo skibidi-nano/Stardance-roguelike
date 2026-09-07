@@ -15,6 +15,8 @@ npc;
 npc npc_init(int map_width, int map_height, int number, bool state);
 npc npc_kill(npc enemy, int current_enemy_count);
 entity standard_enemy_stats(int max, int current, int power);
-void standard_enemy_sprite(void);
+
+void address_enemy_sprite(void);
+void modulo_enemy_sprite(void);
 
 #endif

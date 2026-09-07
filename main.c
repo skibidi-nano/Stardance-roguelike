@@ -63,6 +63,7 @@ int main(void)
     {
 
         int selection = 0;
+
         switch (current_gamestate)
         {
             case STATE_MENU:
@@ -71,17 +72,27 @@ int main(void)
 
             case STATE_MAP:
                 handle_map_input(user_input);
-                break;
+                if (current_gamestate != STATE_BATTLE)
+                {   
+                    break;
+                }
 
             case STATE_BATTLE:
                 selection = handle_battle_input(user_input);
+                if (current_gamestate != STATE_INVENTORY)
+                {   
+                    break;
+                }
+
+            case STATE_INVENTORY:
+            selection = handle_inventory_input(user_input);
                 break;
 
             case STATE_ITEM:
                 handle_item_input(user_input);
-                break;
-            case STATE_INVENTORY:
-                selection = handle_inventory_input(user_input);
+                
+
+            
 
         }
 
@@ -113,6 +124,7 @@ int main(void)
     }
 
     endwin();
+
     return 0;
 }
 
@@ -130,13 +142,13 @@ void handle_menu_input(int user_input)
     menu_init();
     switch(user_input) 
     {
-                case '1': 
-                    map_init();       // generate a new room
-                    reset_stats();    // reset player hp
-                    player_y = 1;     // reset player position
-                    player_x = 1;
-                    current_gamestate = STATE_MAP; 
-                    break;
+        case '1': 
+            map_init();       // generate a new room
+            reset_stats();    // reset player hp
+            player_y = 1;     // reset player position
+            player_x = 1;
+            current_gamestate = STATE_MAP; 
+            break;
     }
 }
 
@@ -194,9 +206,10 @@ int handle_battle_input(int user_input)
     if(battle_check == 0)
     {    
         battle_screen_init();
-        battle_init();
+        battle_init(target_enemy_y, target_enemy_x);
         score = 0; //reset score
         battle_check++;
+        return 0;
     }
 
     //check for user input
@@ -215,6 +228,7 @@ int handle_battle_input(int user_input)
     }
 
     static battle_result outcome = BATTLE_IN_PROGRESS;
+
     outcome = process_battle_turn(battle_check, selection, lock, target_enemy_x, target_enemy_y);
 
     lock = 0;

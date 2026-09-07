@@ -24,10 +24,12 @@ typedef enum
 } choice;
 
 battle_result process_battle_turn(int init_mode, choice selection, int lock, int enemy_x, int enemy_y);
-void battle_init(void);
+void battle_init(int enemy_y, int enemy_x);
 void battle_screen_init(void);
 void battle_screen_draw(choice selection);
 void battle_menu_draw(choice selection);
 
 int* get_location_of(items item);
 void reset_stats(void);
+
+entity stats_enemy(type type);
