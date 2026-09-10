@@ -70,9 +70,16 @@ void print_frame_select(items item, int position_y, int position_x)
         mvprintw(position_y,  position_x, "++++++");
         mvprintw(position_y + 1,  position_x, "+ <3 + <<<");
         mvprintw(position_y + 2,  position_x, "++++++");
-        mvprintw(5, 50, "HEALS YOU FOR 5 HP");
+        mvprintw(3, 5, "HEALS YOU FOR 5 HP");
     }
-    else
+    else if (item == DAMAGE)
+    {
+        mvprintw(position_y,  position_x, "++++++");
+        mvprintw(position_y + 1,  position_x, "+ !  + <<<");
+        mvprintw(position_y + 2,  position_x, "++++++");
+        mvprintw(3, 5, "DEALS 4 HP OF DAMAGE TO YOUR OPPONENT");
+    }
+    else if (item == EMPTY)
     {
         mvprintw(position_y,  position_x, "++++++");
         mvprintw(position_y + 1,  position_x, "+    + <<<");
@@ -85,10 +92,15 @@ void print_frame_not_select(items item, int position_y, int position_x)
     if (item == HEAL)
     {
         mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+ <3 +");
+        mvprintw(position_y + 1,  position_x, "+ <3  +");
         mvprintw(position_y + 2,  position_x, "++++++");
-        mvprintw(5, 50, "HEALS YOU FOR 5 HP");
 
+    }
+    else if (item == DAMAGE)
+    {
+        mvprintw(position_y,  position_x, "++++++");
+        mvprintw(position_y + 1,  position_x, "+ !  +");
+        mvprintw(position_y + 2,  position_x, "++++++");
     }
     else
     {

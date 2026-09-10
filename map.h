@@ -4,7 +4,7 @@
 #include "config.h"
 #include "npc.h"
 
-void map_init(void);
+void map_init(bool debug);
 void map_draw(void);
 
 int map_is_wall(int y, int x);

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "npc.h"
 #include "generation.h"
+#include "battle_screen.h"
 
 static char item_screen[ITEM_SCREEN_HEIGHT][ITEM_SCREEN_WIDTH];
 
@@ -58,7 +59,7 @@ items random_item(void)
     {
         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, 
         EXTRA_STRENGTH, EXTRA_STRENGTH, 
-        EXTRA_HP, EXTRA_HP
+        EXTRA_HP, EXTRA_HP, DAMAGE
     };
     
     int count = sizeof(possible_items) / sizeof(possible_items[0]);
@@ -85,6 +86,10 @@ void item_screen_draw(items item)
             heal_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A HEALING POTION", -1);
             break;
+        case DAMAGE:
+            damage_sprite();
+            mvaddnstr(2, 31, "YOU'VE GOT A DAMAGE POTION", -1);
+            break;
         case EXTRA_STRENGTH:
             extra_strength_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
@@ -100,6 +105,37 @@ void item_screen_draw(items item)
     mvaddnstr(18, 31, "PRESS \"ESCAPE\" TO RETURN", -1);
 
     mvaddnstr(19, 31, "PRESS \"ENTER\" TO PICK UP", -1);
+}
+
+void heal_potion(void)
+{
+    int *heal_manipulator = NULL;
+    int *max_hp_ptr = NULL;
+    max_hp_ptr = get_location_of(EXTRA_HP);
+    heal_manipulator = get_location_of(HEAL);
+    if (*heal_manipulator + HEALING_AMOUNT > *max_hp_ptr)
+    {
+        *heal_manipulator = *max_hp_ptr;
+    }
+    else
+    {
+        *heal_manipulator += HEALING_AMOUNT;
+    }
+}
+
+void damage_potion(void)
+{
+    int *enemy_life_manipulator = NULL;
+    int *enemy_hp_ptr = NULL;
+    enemy_life_manipulator = get_location_of(DAMAGE);
+    if (*enemy_life_manipulator - DAMAGE_POTION_AMOUNT < 0)
+    {
+        *enemy_life_manipulator = 0;
+    }
+    else
+    {
+        *enemy_life_manipulator -= DAMAGE_POTION_AMOUNT;
+    }
 }
 
 void heal_sprite(void)
@@ -118,6 +154,26 @@ void heal_sprite(void)
     mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
     mvprintw(14, ITEM_POS_Y, "    |  |~~~~~~~|  |");
     mvprintw(15, ITEM_POS_Y, "    |  |~~~~~~~|  |");
+    mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_Y, "      `---------'");
+}
+
+void damage_sprite(void)
+{
+    mvprintw(2,  ITEM_POS_Y, "       ( (       ");
+    mvprintw(3,  ITEM_POS_Y, "        ) )      ");
+    mvprintw(4,  ITEM_POS_Y, "      .----+----.");
+    mvprintw(5,  ITEM_POS_Y, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_Y, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_Y, "      | | (o) | |");
+    mvprintw(8,  ITEM_POS_Y, "      | | / \\ | |");
+    mvprintw(9,  ITEM_POS_Y, "      | |  ~  | |");
+    mvprintw(10, ITEM_POS_Y, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_Y, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_Y, "     /           \\");
+    mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_Y, "    |  |x x x x|  |");
+    mvprintw(15, ITEM_POS_Y, "    |  |x x x x|  |");
     mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
     mvprintw(17, ITEM_POS_Y, "      `---------'");
 }

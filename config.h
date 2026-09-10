@@ -56,6 +56,7 @@ typedef enum
 #define EXTRA_STRENGTH_AMOUNT 1
 #define EXTRA_HP_AMOUNT 2
 #define HEALING_AMOUNT 5
+#define DAMAGE_POTION_AMOUNT 4
 
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2

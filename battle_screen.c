@@ -204,6 +204,7 @@ int* get_location_of(items item) //need to rewrite    ps:not sure tho probably j
         case HEAL: return &player.current_hp;
         case EXTRA_STRENGTH: return &attack_power;
         case EXTRA_HP: return &max_hp;
+        case DAMAGE: return &enemy.current_hp;
         default: return NULL;
     }
 }

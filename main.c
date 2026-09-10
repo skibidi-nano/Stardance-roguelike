@@ -8,7 +8,6 @@
 #include "highscore.h"
 #include "item.h"
 #include "inventory.h"
-
 void map_refresh(int player_y, int player_x);
 void handle_menu_input(int user_input);
 void handle_map_input(int user_input);
@@ -17,6 +16,8 @@ void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
 void reset_inventory(void);
 
+
+bool debug = false;
 
 //player starting position (prob will be changed)
 int player_y = 1;
@@ -49,7 +50,7 @@ int main(void)
     noecho();
 
     //sets the map array up
-    map_init();
+    map_init(debug);
     
     //first menu init
     menu_init();
@@ -62,7 +63,7 @@ int main(void)
     while ((user_input = getch()) != 'q')
     {
 
-        int selection = 0;
+        static int selection = 0;
 
         switch (current_gamestate)
         {
@@ -73,27 +74,31 @@ int main(void)
             case STATE_MAP:
                 handle_map_input(user_input);
                 if (current_gamestate != STATE_BATTLE)
-                {   
+                { 
                     break;
+                }
+                else
+                {
+                    user_input = 0;
                 }
 
             case STATE_BATTLE:
                 selection = handle_battle_input(user_input);
                 if (current_gamestate != STATE_INVENTORY)
-                {   
+                { 
                     break;
+                }
+                else
+                {
+                    user_input = 0;
                 }
 
             case STATE_INVENTORY:
-            selection = handle_inventory_input(user_input);
+                selection = handle_inventory_input(user_input);
                 break;
 
             case STATE_ITEM:
                 handle_item_input(user_input);
-                
-
-            
-
         }
 
         clear();
@@ -142,13 +147,22 @@ void handle_menu_input(int user_input)
     menu_init();
     switch(user_input) 
     {
-        case '1': 
-            map_init();       // generate a new room
+        case '1':  //regular mode
+            map_init(debug);       // generate a new room
             reset_stats();    // reset player hp
             player_y = 1;     // reset player position
             player_x = 1;
             current_gamestate = STATE_MAP; 
             break;
+        case '2': //debug mode
+            debug = true;
+            map_init(debug);       // generate a new room
+            reset_stats();    // reset player hp
+            player_y = 1;     // reset player position
+            player_x = 1;
+            current_gamestate = STATE_MAP; 
+
+
     }
 }
 
@@ -169,7 +183,7 @@ void handle_map_input(int user_input)
     //door collision check
     if (map_is_door(next_y, next_x))
     {
-        map_init();
+        map_init(debug);
         player_y = 1;
         player_x = 1;
     }
@@ -268,13 +282,22 @@ void handle_item_input(int user_input)
         switch (current_item)
         {
             case HEAL:
-                        inventory[inventory_track] = current_item;
-                        inventory_track++;
-                        if (inventory_track == 10)
-                        {
-                            inventory_track = 0;
-                        }
-                        break;
+                    inventory[inventory_track] = current_item;
+                    inventory_track++;
+                    if (inventory_track == 10)
+                    {
+                        inventory_track = 0;
+                    }
+                    break;
+        
+            case DAMAGE:
+                    inventory[inventory_track] = current_item;
+                    inventory_track++;
+                    if (inventory_track == 10)
+                    {
+                        inventory_track = 0;
+                    }
+                    break;
 
             case EXTRA_STRENGTH: 
                     max_strength_manipulator = get_location_of(EXTRA_STRENGTH);
@@ -287,12 +310,10 @@ void handle_item_input(int user_input)
                     *max_hp_manipulator += EXTRA_HP_AMOUNT;
                     reset_stats();
                     break;
-            case EMPTY:
-                    break;
+            default: break;
         }
 
         map_remove_item_at(target_item_y, target_item_x);
-
         current_gamestate = STATE_MAP;
     }
     else if (lock == ESC)
@@ -334,21 +355,15 @@ int handle_inventory_input(int user_input)
         switch (inventory[selection])
         {
             case HEAL : 
-                max_hp_ptr = get_location_of(EXTRA_HP);
-                heal_manipulator = get_location_of(HEAL);
-                if (*heal_manipulator + HEALING_AMOUNT > *max_hp_ptr)
-                {
-                    *heal_manipulator = *max_hp_ptr;
-                }
-                else
-                {
-                *heal_manipulator += HEALING_AMOUNT;
-                }
+                heal_potion();
                 inventory[selection] = EMPTY;
                 break;
-            case EMPTY : break;
-            case EXTRA_HP : break;
-            case EXTRA_STRENGTH : break;
+            case DAMAGE :
+                damage_potion();
+                inventory[selection] = EMPTY;
+                break;
+
+            default : break;
         }
         current_gamestate = STATE_BATTLE;
     }

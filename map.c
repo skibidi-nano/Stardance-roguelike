@@ -14,7 +14,7 @@ static item room_items[MAX_NUMBER_OF_ITEMS];
 static int room_counter = 0;
 
 //initialisation of the map array
-void map_init(void)
+void map_init(bool debug)
 {
     int decide_enemies = 0;
     room_counter++;
@@ -37,6 +37,30 @@ void map_init(void)
         room_items[i] = item_init(current_room.width, current_room.height, i, TRUE, room_enemies, enemy_amnt);
     }
 
+    //DEBUG MODE
+
+    if (debug == true)
+    {
+        for (int y = 0; y < current_room.height; y++)
+        {
+            for (int x = 0; x < current_room.width; x++)
+            {
+                map[y][x] = ' ';
+            }
+        }
+            map[2][2] = '&';
+            map[2][3] = '%';
+            for (int i = 0; i < 10; i++)
+            {
+                map[4][i] = '+';
+            }
+
+        return;
+    }
+
+    
+
+    //NORMAL MODE
     for (int y = 0; y < current_room.height; y++)
     {
         for (int x = 0; x < current_room.width; x++)
@@ -78,6 +102,8 @@ void map_init(void)
             }
         }
     }
+
+    
 }
 
 //Puts the map on the screen
@@ -134,7 +160,7 @@ int map_is_item(int y, int x)
     
     if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
     {
-        return 0; //change to 1 for debug mode (when going through doors that shouldnt be able to get access, you get items)
+        return 1; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items)
     }
     return map[y][x] == '+';
 }
@@ -179,3 +205,5 @@ void map_remove_item_at(int y, int x)
         }
     }
 }
+
+
