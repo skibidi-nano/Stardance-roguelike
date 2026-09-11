@@ -8,16 +8,16 @@
 #include "highscore.h"
 #include "item.h"
 #include "inventory.h"
+
+
 void map_refresh(int player_y, int player_x);
+void boss_map_refresh(int player_refresh_y, int player_refresh_x);
 void handle_menu_input(int user_input);
 void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
 void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
 void reset_inventory(void);
-
-
-bool debug = false;
 
 //player starting position (prob will be changed)
 int player_y = 1;
@@ -38,6 +38,7 @@ items current_item;
 items inventory[INVENTORY_SIZE];
 
 gamestate current_gamestate = STATE_MENU;
+mapstate current_mapstate = STATE_STANDARD;
 
 int main(void)
 {
@@ -50,7 +51,7 @@ int main(void)
     noecho();
 
     //sets the map array up
-    map_init(debug);
+    map_init(current_mapstate);
     
     //first menu init
     menu_init();
@@ -148,15 +149,15 @@ void handle_menu_input(int user_input)
     switch(user_input) 
     {
         case '1':  //regular mode
-            map_init(debug);       // generate a new room
+            map_init(current_mapstate);       // generate a new room
             reset_stats();    // reset player hp
             player_y = 1;     // reset player position
             player_x = 1;
             current_gamestate = STATE_MAP; 
             break;
         case '2': //debug mode
-            debug = true;
-            map_init(debug);       // generate a new room
+            current_mapstate = STATE_DEBUG;
+            map_init(current_mapstate);       // generate a new room
             reset_stats();    // reset player hp
             player_y = 1;     // reset player position
             player_x = 1;
@@ -168,6 +169,7 @@ void handle_menu_input(int user_input)
 
 void handle_map_input(int user_input)
 {
+    int boss_room_check;
     next_y = player_y;
     next_x = player_x;
 
@@ -181,11 +183,23 @@ void handle_map_input(int user_input)
     }
 
     //door collision check
-    if (map_is_door(next_y, next_x))
+    if ((boss_room_check = map_is_door(next_y, next_x)))
     {
-        map_init(debug);
-        player_y = 1;
-        player_x = 1;
+        switch (boss_room_check)
+        {
+            case BOSS_ROOM_ACTIVATION_COUNT: 
+                current_mapstate = STATE_BOSS;
+                map_init(current_mapstate);
+                player_y = 1;
+                player_x = 1;
+                break;
+            default:
+                map_init(current_mapstate);
+                player_y = 1;
+                player_x = 1;
+                break;
+        }
+        
     }
     //player-enemy collision check
     else if(map_is_enemy(next_y, next_x))
@@ -249,13 +263,21 @@ int handle_battle_input(int user_input)
 
     if (outcome == BATTLE_VICTORY)
     {
-        score = score_tracking(SCORE_FOR_DEFEATING_ENEMY);
+        score = score_tracking(SCORE_FOR_DEFEATING_ENEMY); 
+        /*int *room_counter = NULL; ////////////////////////////////////
+        room_counter = position_of_room_counter(); ///////////////////
+        *room_counter = 0; //////////////////////////////////TEMPORARY*/
+        current_mapstate = STATE_STANDARD;
         current_gamestate = STATE_MAP;
     }
     else if (outcome == BATTLE_DEFEAT)
     {
+        int *room_counter = NULL;
+        room_counter = position_of_room_counter();
+        *room_counter = 0;
         score_register();
         reset_inventory();
+        current_mapstate = STATE_STANDARD;
         current_gamestate = STATE_MENU;
     }
 
@@ -264,8 +286,6 @@ int handle_battle_input(int user_input)
 
 void handle_item_input(int user_input)
 {
-
-    //edge case: more than 10 items: check if items in inventory = 10 if so give option to return to map (overall i should add this)
     int lock = 0;
     int *max_hp_manipulator = NULL;
     int *max_strength_manipulator = NULL;

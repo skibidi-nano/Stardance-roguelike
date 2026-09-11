@@ -37,6 +37,7 @@ battle_result process_battle_turn(int init_mode, choice selection, int lock, int
         {
             case '&': enemy = stats_enemy(ADDRESS); break;
             case '%': enemy = stats_enemy(MODULO); break;
+            case '*': enemy = stats_enemy(BOSS); break;
         }
         player_ptr = &player; 
         enemy_ptr = &enemy;
@@ -165,6 +166,7 @@ void battle_screen_draw(choice selection)
     {
         case '&': address_enemy_sprite(); break;
         case '%': modulo_enemy_sprite(); break;
+        case '*': boss_sprite();
     }
     
 
@@ -237,6 +239,12 @@ entity stats_enemy(type type)
             current_enemy.attack_power = 4;
             current_enemy.type = MODULO;
             break;
+        case BOSS:
+            current_enemy.max_hp = 25;
+            current_enemy.current_hp = current_enemy.max_hp;
+            current_enemy.attack_power = 5;
+            current_enemy.type = BOSS;
+
 
     }
 

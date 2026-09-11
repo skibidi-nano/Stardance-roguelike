@@ -14,7 +14,7 @@ static item room_items[MAX_NUMBER_OF_ITEMS];
 static int room_counter = 0;
 
 //initialisation of the map array
-void map_init(bool debug)
+void map_init(mapstate current_mapstate)
 {
     int decide_enemies = 0;
     room_counter++;
@@ -22,88 +22,111 @@ void map_init(bool debug)
 
     current_room = random_room_gen();
 
-    int enemy_amnt = (current_room.width * current_room.height) / 200; //dynamic number of enemies
-
-    for (int i = 0; i < enemy_amnt; i++)
+    switch (current_mapstate)
     {
-        room_enemies[i]  = npc_init(current_room.width, current_room.height, i, TRUE);
-        enemy_counter++;
-    }
+        case STATE_STANDARD:
+            
+            int enemy_amnt = (current_room.width * current_room.height) / 200; //dynamic number of enemies
 
-    int item_amnt = items_per_room(current_room.width, current_room.height);
-    
-    for (int i = 0; i < item_amnt; i++)
-    {
-        room_items[i] = item_init(current_room.width, current_room.height, i, TRUE, room_enemies, enemy_amnt);
-    }
-
-    //DEBUG MODE
-
-    if (debug == true)
-    {
-        for (int y = 0; y < current_room.height; y++)
-        {
-            for (int x = 0; x < current_room.width; x++)
+            for (int i = 0; i < enemy_amnt; i++)
             {
-                map[y][x] = ' ';
+                room_enemies[i]  = npc_init(current_room.width, current_room.height, i, TRUE);
+                enemy_counter++;
             }
-        }
+
+            int item_amnt = items_per_room(current_room.width, current_room.height);
+    
+            for (int i = 0; i < item_amnt; i++)
+            {
+                room_items[i] = item_init(current_room.width, current_room.height, i, TRUE, room_enemies, enemy_amnt);
+            }
+            for (int y = 0; y < current_room.height; y++)
+            {
+                for (int x = 0; x < current_room.width; x++)
+                {
+                    if (y == current_room.door_y && x == current_room.door_x)
+                    {
+                    map[y][x] = '0'; //door symbol
+                    }
+                    else if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
+                    {
+                        map[y][x] = '#'; //wall symbol
+                    }
+                    else
+                    {
+                        map[y][x] = '.'; //floor symbol
+                    }
+                    for (int i = 0; i < enemy_amnt; i++) 
+                    {
+                        if (y == room_enemies[i].npc_y && x == room_enemies[i].npc_x && room_enemies[i].active == TRUE)
+                        {
+                            decide_enemies = get_random_int(1, enemy_amnt);
+                            if (decide_enemies > 2)
+                            {
+                                map[y][x] = '%'; //enemie symbol (alt enemy)
+                            }
+                            else
+                            {
+                                map[y][x] = '&'; //enemie symbol (evil pointer)
+                            }
+                        }
+                    }
+                    for (int i = 0; i < item_amnt; i++)
+                    {
+                        if (y == room_items[i].item_y && x == room_items[i].item_x && room_items[i].active == TRUE)
+                        {
+                            map[y][x] = '+'; //item symbol
+                        }
+                    }
+                }
+            }
+            break;
+
+        case STATE_DEBUG: 
+
+            for (int y = 0; y < current_room.height; y++)
+            {
+                for (int x = 0; x < current_room.width; x++)
+                {
+                    map[y][x] = ' ';
+                }
+            }
             map[2][2] = '&';
             map[2][3] = '%';
             for (int i = 0; i < 10; i++)
             {
                 map[4][i] = '+';
             }
+            break;
 
-        return;
-    }
-
-    
-
-    //NORMAL MODE
-    for (int y = 0; y < current_room.height; y++)
-    {
-        for (int x = 0; x < current_room.width; x++)
-        {
-            if (y == current_room.door_y && x == current_room.door_x)
+        case STATE_BOSS:
+        
+            enemy_counter++;
+            room_enemies[0] = boss_init();
+            for (int y = 0; y < MAX_HEIGHT; y++)
             {
-                map[y][x] = '0'; //door symbol
-            }
-            else if (y == 0 || y == current_room.height -1 || x == 0 || x == current_room.width -1)
-            {
-                map[y][x] = '#'; //wall symbol
-            }
-            else
-            {
-                map[y][x] = '.'; //floor symbol
-            }
-            for (int i = 0; i < enemy_amnt; i++) 
-            {
-                if (y == room_enemies[i].npc_y && x == room_enemies[i].npc_x && room_enemies[i].active == TRUE)
+                for (int x = 0; x < MAX_WIDTH; x++)
                 {
-                    decide_enemies = get_random_int(1, enemy_amnt);
-                    if (decide_enemies > 2)
+                    map[y][x] = ' ';
+                }
+            }
+            for (int y = 0; y < BOSS_ROOM_DIMENSION; y++)
+            {
+                for (int x = 0; x < BOSS_ROOM_DIMENSION; x++)
+                {
+                    if (y == 0 || y == BOSS_ROOM_DIMENSION -1 || x == 0 || x == BOSS_ROOM_DIMENSION -1)
                     {
-                        map[y][x] = '%'; //enemie symbol (alt enemy)
+                        map[y][x] = '#';
                     }
                     else
                     {
-                            map[y][x] = '&'; //enemie symbol (evil pointer)
+                        map[y][x] = '.';
                     }
-
                 }
             }
-            for (int i = 0; i < item_amnt; i++)
-            {
-                if (y == room_items[i].item_y && x == room_items[i].item_x && room_items[i].active == TRUE)
-                {
-                    map[y][x] = '+'; //item symbol
-                }
-            }
-        }
+            map[5][5] = '*';
+            map[0][6] = '0';
     }
-
-    
 }
 
 //Puts the map on the screen
@@ -139,7 +162,14 @@ int map_is_door(int y, int x)
     {
         return 0;
     }
-    return map[y][x] == '0';
+    else if (room_counter == BOSS_ROOM_ACTIVATION_COUNT && map[y][x] == '0')
+    {
+        return BOSS_ROOM_ACTIVATION_COUNT;
+    }
+    else
+    {
+        return map[y][x] == '0';
+    }
 }
 
 int map_is_enemy(int y, int x)
@@ -148,7 +178,7 @@ int map_is_enemy(int y, int x)
     {
         return 0;
     }
-    else if (map[y][x] == '&' || map[y][x] == '%')
+    else if (map[y][x] == '&' || map[y][x] == '%' || map[y][x] == '*')
     {
         return 1;
     }
@@ -175,6 +205,11 @@ char value_of_part_of_map(int y, int x)
     return map[y][x];
 }
 
+int* position_of_room_counter(void)
+{
+    return &room_counter;
+}
+
 void map_remove_enemy_at(int y, int x) 
 {
     map[y][x] = '.'; // Remove enemy
@@ -184,7 +219,7 @@ void map_remove_enemy_at(int y, int x)
     {
         if (room_enemies[i].npc_y == y && room_enemies[i].npc_x == x) 
         {
-            room_enemies[i].active = FALSE;
+            room_enemies[i].active = false;
             enemy_counter--; // Decrement counter for door logic
             break;
         }

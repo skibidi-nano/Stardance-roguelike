@@ -7,6 +7,7 @@ typedef enum
 {
     ADDRESS,
     MODULO,
+    BOSS
 }
 type;
 

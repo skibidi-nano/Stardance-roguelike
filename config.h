@@ -8,9 +8,17 @@ typedef enum
     STATE_BATTLE,
     STATE_MENU,
     STATE_ITEM,
-    STATE_INVENTORY
-} gamestate;
+    STATE_INVENTORY,
+} 
+gamestate;
 
+typedef enum
+{
+    STATE_STANDARD,
+    STATE_BOSS,
+    STATE_DEBUG
+}
+mapstate;
 
 //For menu size (pls dont change)
 #define MENU_WIDTH 56
@@ -57,6 +65,10 @@ typedef enum
 #define EXTRA_HP_AMOUNT 2
 #define HEALING_AMOUNT 5
 #define DAMAGE_POTION_AMOUNT 4
+
+//for boss fights
+#define BOSS_ROOM_DIMENSION 11
+#define BOSS_ROOM_ACTIVATION_COUNT 2
 
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2
