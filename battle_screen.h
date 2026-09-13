@@ -13,6 +13,7 @@ typedef enum
     BATTLE_DEFEAT,
     BATTLE_FLED,
     BATTLE_SETUP,
+    BATTLE_INVENTORY,
     BATTLE_ERROR
 } battle_result;
 
@@ -23,7 +24,7 @@ typedef enum
     RUN
 } choice;
 
-battle_result process_battle_turn(int init_mode, choice selection, int lock, int enemy_x, int enemy_y);
+battle_result process_battle_turn(choice selection, int lock, int enemy_x, int enemy_y);
 void battle_init(int enemy_y, int enemy_x);
 void battle_screen_init(void);
 void battle_screen_draw(choice selection);

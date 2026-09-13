@@ -65,47 +65,71 @@ void inventory_screen_draw(int selection, items inventory[])
 
 void print_frame_select(items item, int position_y, int position_x)
 {
-    if (item == HEAL)
+    switch (item)
     {
-        mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+ <3 + <<<");
-        mvprintw(position_y + 2,  position_x, "++++++");
-        mvprintw(3, 5, "HEALS YOU FOR 5 HP");
-    }
-    else if (item == DAMAGE)
-    {
-        mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+ !  + <<<");
-        mvprintw(position_y + 2,  position_x, "++++++");
-        mvprintw(3, 5, "DEALS 4 HP OF DAMAGE TO YOUR OPPONENT");
-    }
-    else if (item == EMPTY)
-    {
-        mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+    + <<<");
-        mvprintw(position_y + 2,  position_x, "++++++");
+        case HEAL:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+ <3 + <<<");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            mvprintw(3, 5, "HEALS YOU FOR 5 HP");
+            break;
+
+        case DAMAGE:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+ !  + <<<");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            mvprintw(3, 5, "DEALS 4 HP OF DAMAGE TO YOUR OPPONENT");
+            break;
+
+        case POISON:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+X_X + <<<");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            mvprintw(3, 5, "DEALS 2 HP OF DAMAGE TO YOUR OPPONENT FOR 3 ROUNDS");
+            break;
+
+        case EMPTY:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+    + <<<");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            break;
+
+        default:
+            break;
     }
 }
 
 void print_frame_not_select(items item, int position_y, int position_x)
 {
-    if (item == HEAL)
+    switch (item)
     {
-        mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+ <3  +");
-        mvprintw(position_y + 2,  position_x, "++++++");
+        case HEAL:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+ <3 +");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            break;
 
-    }
-    else if (item == DAMAGE)
-    {
-        mvprintw(position_y,  position_x, "++++++");
-        mvprintw(position_y + 1,  position_x, "+ !  +");
-        mvprintw(position_y + 2,  position_x, "++++++");
-    }
-    else
-    {
-        mvprintw(position_y,  position_x , "++++++");
-        mvprintw(position_y + 1,  position_x, "+    +");
-        mvprintw(position_y + 2,  position_x, "++++++");
+        case DAMAGE:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+ !  +");
+            mvprintw(position_y + 2,  position_x, "++++++");
+
+            break;
+
+        case POISON:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+X_X +");
+            mvprintw(position_y + 2,  position_x, "++++++");
+
+            break;
+
+        case EMPTY:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+    +");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            break;
+
+        default:
+            break;
     }
 }

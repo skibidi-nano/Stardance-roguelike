@@ -6,14 +6,18 @@ void draw_health_bar(int current_hp, int max_hp, int y)
 {
     for (int i = 0; i < max_hp; i++)
     {
-       if (i < current_hp)
-       {
+        if ((current_hp - 2) > MAX_HP_LENGTH)
+        {
+            break;
+        }
+        if (i < current_hp)
+        {
             mvprintw(y, 2 + i, "+");
-       }
-       else
-       {
+        }
+        else
+        {
             mvprintw(y, 2 + i, "-");
-       }
+        }
     }
 }
 

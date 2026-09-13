@@ -13,20 +13,20 @@ item item_init(int map_width, int map_height, int number, bool state, npc enemy[
     item floor_item;
     bool valid_position;
 
-    // collision check for starting position and enemy position
+    //collision check for starting position and enemy position
     do {
         valid_position = true;
         floor_item.item_x = get_random_int(1, map_width - 2);
         floor_item.item_y = get_random_int(1, map_height - 2);
 
-        // block the starting position
+        //block the starting position
         if (floor_item.item_x == 1 && floor_item.item_y == 1) 
         {
             valid_position = false;
             continue;
         }
 
-        // check if item position is the same as enemy position
+        //check if item position is the same as enemy position
         for (int i = 0; i < enemy_amnt; i++) 
         {
             if (floor_item.item_x == enemy[i].npc_x && floor_item.item_y == enemy[i].npc_y) {
@@ -55,11 +55,12 @@ int items_per_room(int room_width, int room_height)
 
 items random_item(void)
 {
+    // array of all possible items
     static const items possible_items[] = 
     {
         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, 
         EXTRA_STRENGTH, EXTRA_STRENGTH, 
-        EXTRA_HP, EXTRA_HP, DAMAGE
+        EXTRA_HP, EXTRA_HP, DAMAGE, DAMAGE, POISON
     };
     
     int count = sizeof(possible_items) / sizeof(possible_items[0]);
@@ -70,6 +71,7 @@ items random_item(void)
 
 void init_item_screen(void)
 {
+    //easy way to fill the entire screen with blank values
     memset(item_screen, ' ', sizeof(item_screen));
 }
 
@@ -86,18 +88,27 @@ void item_screen_draw(items item)
             heal_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A HEALING POTION", -1);
             break;
+            
         case DAMAGE:
             damage_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A DAMAGE POTION", -1);
             break;
+
+        case POISON:
+            poison_sprite();
+            mvaddnstr(2, 31, "YOU'VE GOT A POISON POTION", -1);
+            break;
+
         case EXTRA_STRENGTH:
             extra_strength_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
             break;
+
         case EXTRA_HP:
             extra_hp_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT AN EXTRA HP ENCHANTMENT", -1);
             break;
+
         default:
             break;
     }
@@ -126,7 +137,6 @@ void heal_potion(void)
 void damage_potion(void)
 {
     int *enemy_life_manipulator = NULL;
-    int *enemy_hp_ptr = NULL;
     enemy_life_manipulator = get_location_of(DAMAGE);
     if (*enemy_life_manipulator - DAMAGE_POTION_AMOUNT < 0)
     {
@@ -176,6 +186,26 @@ void damage_sprite(void)
     mvprintw(15, ITEM_POS_Y, "    |  |x x x x|  |");
     mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
     mvprintw(17, ITEM_POS_Y, "      `---------'");
+}
+
+void poison_sprite(void)
+{
+    mvprintw(2,  50, "       ( (       ");
+    mvprintw(3,  50, "        ) )      ");
+    mvprintw(4,  50, "      .----+----.");
+    mvprintw(5,  50, "      |  _---_  |");
+    mvprintw(6,  50, "      | /     \\ |");
+    mvprintw(7,  50, "      | |  _  | |");
+    mvprintw(8,  50, "      | | (o) | |");
+    mvprintw(9,  50, "      | | /|\\ | |");
+    mvprintw(10, 50, "      | \\_   _/ |");
+    mvprintw(11, 50, "      |   \"\"    |");
+    mvprintw(12, 50, "     /           \\");
+    mvprintw(13, 50, "    |  .-------.  |");
+    mvprintw(14, 50, "    |  |o O o O|  |");
+    mvprintw(15, 50, "    |  | O o O o| |");
+    mvprintw(16, 50, "     \\ '-------' /");
+    mvprintw(17, 50, "      `---------'");
 }
 
 void extra_hp_sprite(void)

@@ -19,9 +19,6 @@ npc npc_init(int map_width, int map_height, int number, bool state)
     enemy.number = number;
     enemy.active = state;
 
-    //dynamic variable names or something of same value
-
-    //what the fuck does that mean kobe bryant? (Keeping this because i am gen interested in what i meant with this)
     return enemy;
 }
 

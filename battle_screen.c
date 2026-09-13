@@ -11,39 +11,22 @@
 
 static char battle_screen[BATTLE_SCREEN_HEIGHT][BATTLE_SCREEN_WIDTH];
 static int max_hp = 20;
-static int current_hp = 20;
 static int attack_power = 5;
 
 static char enemy_type;
-
+static entity *player_ptr;
+static entity *enemy_ptr;
 // initial stats entity
 static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
 static entity enemy;  
 //sets the stats for the entities that are fighting
 
-battle_result process_battle_turn(int init_mode, choice selection, int lock, int enemy_x, int enemy_y)
+battle_result process_battle_turn(choice selection, int lock, int enemy_x, int enemy_y)
 {
     //static so they store the same addresses across loops
-    static entity *player_ptr = NULL;
-    static entity *enemy_ptr = NULL;
-    npc *enemies = position_of_enemy_array();
-    static turn_player current_turn = TURN_PLAYER;
 
-    //gets called one to set up the entities
-    if (init_mode == 0)
-    {
-        enemy_type = value_of_part_of_map(enemy_y, enemy_x);
-        switch (enemy_type)
-        {
-            case '&': enemy = stats_enemy(ADDRESS); break;
-            case '%': enemy = stats_enemy(MODULO); break;
-            case '*': enemy = stats_enemy(BOSS); break;
-        }
-        player_ptr = &player; 
-        enemy_ptr = &enemy;
-        current_turn = TURN_PLAYER; //default starting turn is player
-        return BATTLE_SETUP;
-    }
+    //npc *enemies = position_of_enemy_array(); POTENTIALLY USEFULL CURRENTLY USELESS
+    static turn_player current_turn = TURN_PLAYER;
 
     //check for issues
     if (player_ptr == NULL || enemy_ptr == NULL)
@@ -51,47 +34,52 @@ battle_result process_battle_turn(int init_mode, choice selection, int lock, int
         return BATTLE_ERROR;
     }
 
-    //PLAYER TURN
-    if (current_turn == TURN_PLAYER && selection == ATTACK && lock == ENTER)
-    {
-        // Player attacks enemy (dereferencing the pointer to modify values)
-        enemy_ptr->current_hp -= player_ptr->attack_power;
-        if (enemy_ptr->current_hp < 0) 
-        {    
-            enemy_ptr->current_hp = 0;
-        }
-        if (enemy_ptr->current_hp == 0)
-        {
-            map_remove_enemy_at(enemy_y, enemy_x);
-            reset_stats();
-            return BATTLE_VICTORY;
-        }
-        
-        current_turn = TURN_ENEMY; // Switch turn
-    }
-    else if (current_turn == TURN_PLAYER && selection == RUN && lock == ENTER)
-    {
-        //temporary solution, will be implemented soon
-        endwin();
-        return BATTLE_VICTORY;
-    }
-    //ENEMY TURN
-    else if (current_turn == TURN_ENEMY)
+    //ENEMY LOGIC
+    if (current_turn == TURN_ENEMY)
     {
         // Enemy attacks player
         player_ptr->current_hp -= enemy_ptr->attack_power * get_random_int(1, 3); //for random damage
-        if (player_ptr->current_hp < 0)
-        {
-            player_ptr->current_hp = 0;
-        }
-        if (player_ptr->current_hp == 0)
+        if (player_ptr->current_hp <= 0)
         {
             reset_stats();
             return BATTLE_DEFEAT;
         }
         
-
         current_turn = TURN_PLAYER; // Switch turn
+        return BATTLE_IN_PROGRESS;
+    }
+
+    //PLAYER LOGIC
+    if (current_turn == TURN_PLAYER && lock == ENTER)
+    {
+        switch (selection)
+            {
+                case ATTACK:
+                    enemy_ptr->current_hp -= player_ptr->attack_power;
+                    if (enemy_ptr->current_hp <= 0)
+                    {
+                        map_remove_enemy_at(enemy_y, enemy_x); //killing the enemy
+                        reset_stats();
+                        return BATTLE_VICTORY;
+                    }
+                    current_turn = TURN_ENEMY; // Switch turn
+                    break;
+
+                case INVENTORY: //self explandatory
+                    return BATTLE_INVENTORY;
+                    break;
+
+                case RUN: //based on chance if you can escape, if you cant you take damage
+                    int n = get_random_int(1, 3);
+                    if(!(n % 2))
+                    {
+                    return BATTLE_FLED;
+                    }
+                    else
+                    {
+                        current_turn = TURN_ENEMY;
+                    }
+            }
     }
 
     return BATTLE_IN_PROGRESS;
@@ -102,8 +90,15 @@ void battle_init(int enemy_y, int enemy_x)
 {
 
     player = player_stats(player.max_hp, player.current_hp, player.attack_power);
-    
-    battle_result init = process_battle_turn(0, 0, 0, enemy_x, enemy_y);
+    enemy_type = value_of_part_of_map(enemy_y, enemy_x);
+        switch (enemy_type)
+        {
+            case '&': enemy = stats_enemy(ADDRESS); break;
+            case '%': enemy = stats_enemy(MODULO); break;
+            case '*': enemy = stats_enemy(BOSS); break;
+        }
+        player_ptr = &player; 
+        enemy_ptr = &enemy;
 }
 
 
@@ -228,21 +223,21 @@ entity stats_enemy(type type)
     switch (type)
     {
         case ADDRESS: //stats for standard enemies
-            current_enemy.max_hp = 20;
+            current_enemy.max_hp = 20 + value_of_boss_counter();
             current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 3;
+            current_enemy.attack_power = 3 + (2 * value_of_boss_counter());
             current_enemy.type = ADDRESS;
             break;
         case MODULO: //stats for special enemies
-            current_enemy.max_hp = 15;
+            current_enemy.max_hp = 15 + value_of_boss_counter();
             current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 4;
+            current_enemy.attack_power = 4 + (2 * value_of_boss_counter());
             current_enemy.type = MODULO;
             break;
         case BOSS:
-            current_enemy.max_hp = 25;
+            current_enemy.max_hp = 25 + (2 * value_of_boss_counter());
             current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 5;
+            current_enemy.attack_power = 2 * value_of_boss_counter();
             current_enemy.type = BOSS;
 
 

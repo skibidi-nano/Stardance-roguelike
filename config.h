@@ -12,6 +12,7 @@ typedef enum
 } 
 gamestate;
 
+//for deciding which mapstate to print
 typedef enum
 {
     STATE_STANDARD,
@@ -20,7 +21,7 @@ typedef enum
 }
 mapstate;
 
-//For menu size (pls dont change)
+//for menu size (pls dont change)
 #define MENU_WIDTH 56
 #define MENU_HEIGHT 10
 
@@ -30,30 +31,34 @@ mapstate;
 #define MAX_HEIGHT 20
 #define MIN_HEIGHT 5
 
-//For battle screen gen
+//for battle screen gen
 #define BATTLE_SCREEN_WIDTH 80
 #define BATTLE_SCREEN_HEIGHT 20
 
-//For item screen gen
+//for battle
+#define MAX_HP_LENGTH 78
+
+//for item screen gen
 #define ITEM_SCREEN_WIDTH 80
 #define ITEM_SCREEN_HEIGHT 20
 
-//For invenoty screen gen
+//for invenoty screen gen
 #define INVENTORY_WIDTH 80
 #define INVENTORY_HEIGHT 20
 
-//For npc creation
+//for npc creation
 #define MAX_NUMBER_OF_NPCS 8
 
-//For item creation
+//for item creation
 #define MAX_NUMBER_OF_ITEMS 4
 
-//For selection
+//for selection
 #define ENTER 10
 #define ESC 27
 
 //for highscore
 #define SCORE_FOR_DEFEATING_ENEMY 1
+#define SCORE_FOR_DEFEATING_BOSS 5
 
 //for item position
 #define ITEM_POS_Y 30
@@ -68,7 +73,7 @@ mapstate;
 
 //for boss fights
 #define BOSS_ROOM_DIMENSION 11
-#define BOSS_ROOM_ACTIVATION_COUNT 2
+#define BOSS_ROOM_ACTIVATION_COUNT 5
 
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2

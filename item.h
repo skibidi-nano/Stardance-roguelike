@@ -19,6 +19,7 @@ typedef enum
 {
     HEAL,
     DAMAGE,
+    POISON,
     EXTRA_STRENGTH,
     EXTRA_HP,
     EMPTY
@@ -35,7 +36,9 @@ void item_screen_draw(items item);
 void heal_potion(void);
 void damage_potion(void);
 void heal_sprite(void);
+void damage_sprite(void);
+void poison_sprite(void);
 void extra_hp_sprite(void);
 void extra_strength_sprite(void);
-void damage_sprite(void);
+
 #endif

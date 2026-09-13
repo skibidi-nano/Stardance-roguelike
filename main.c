@@ -8,6 +8,7 @@
 #include "highscore.h"
 #include "item.h"
 #include "inventory.h"
+#include "generation.h"
 
 
 void map_refresh(int player_y, int player_x);
@@ -19,7 +20,7 @@ void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
 void reset_inventory(void);
 
-//player starting position (prob will be changed)
+//player/enemy position variables
 int player_y = 1;
 int player_x = 1;
 int next_y = 0;
@@ -29,15 +30,18 @@ int target_enemy_x;
 int target_item_y;
 int target_item_x;
 
-
-int battle_check = 0;
+//for highscore
 int score = 0;
 
+//for items and inventory
 int inventory_track = 0;
 items current_item;
 items inventory[INVENTORY_SIZE];
 
+//for states
+    //for gamestate changes
 gamestate current_gamestate = STATE_MENU;
+    //mainly for debug and boss
 mapstate current_mapstate = STATE_STANDARD;
 
 int main(void)
@@ -52,11 +56,13 @@ int main(void)
 
     //sets the map array up
     map_init(current_mapstate);
+    visible_map_init(1, 1);
     
     //first menu init
     menu_init();
     menu_draw();
 
+    //set up blank inventory
     reset_inventory();
 
     //main loop
@@ -74,25 +80,10 @@ int main(void)
 
             case STATE_MAP:
                 handle_map_input(user_input);
-                if (current_gamestate != STATE_BATTLE)
-                { 
-                    break;
-                }
-                else
-                {
-                    user_input = 0;
-                }
-
+                break;
             case STATE_BATTLE:
                 selection = handle_battle_input(user_input);
-                if (current_gamestate != STATE_INVENTORY)
-                { 
-                    break;
-                }
-                else
-                {
-                    user_input = 0;
-                }
+                break;
 
             case STATE_INVENTORY:
                 selection = handle_inventory_input(user_input);
@@ -134,11 +125,11 @@ int main(void)
     return 0;
 }
 
-// refreshes the game (duh)
+//refreshes the game (duh)
 void map_refresh(int player_refresh_y, int player_refresh_x)
 {
     clear();
-    map_draw();
+    map_draw(current_mapstate);
     mvaddch(player_refresh_y, player_refresh_x, '@');
     refresh();
 }
@@ -157,9 +148,9 @@ void handle_menu_input(int user_input)
             break;
         case '2': //debug mode
             current_mapstate = STATE_DEBUG;
-            map_init(current_mapstate);       // generate a new room
-            reset_stats();    // reset player hp
-            player_y = 1;     // reset player position
+            map_init(current_mapstate);
+            reset_stats();
+            player_y = 1;
             player_x = 1;
             current_gamestate = STATE_MAP; 
 
@@ -182,9 +173,12 @@ void handle_map_input(int user_input)
         case 'd': next_x++; break;
     }
 
+    enemy_pursuit(player_y, player_x);
+
     //door collision check
     if ((boss_room_check = map_is_door(next_y, next_x)))
     {
+        //door logic doubles as boss trigger logic
         switch (boss_room_check)
         {
             case BOSS_ROOM_ACTIVATION_COUNT: 
@@ -204,10 +198,12 @@ void handle_map_input(int user_input)
     //player-enemy collision check
     else if(map_is_enemy(next_y, next_x))
     {
-        current_gamestate = STATE_BATTLE;
-        battle_check = 0;
         target_enemy_y = next_y;
         target_enemy_x = next_x;
+        current_gamestate = STATE_BATTLE;
+        battle_screen_init();
+        battle_init(target_enemy_y, target_enemy_x);
+        score = 0; //reset score
     }
     //player-item collision check
     else if(map_is_item(next_y, next_x))
@@ -216,29 +212,22 @@ void handle_map_input(int user_input)
         target_item_x = next_x;
         current_item = random_item(); //generate item every time a player collides with an item
         current_gamestate = STATE_ITEM;
+        init_item_screen();
     }
-    //wall collision check
+    //player-wall collision check
     else if (!map_is_wall(next_y, next_x))
     {
         player_y = next_y;
         player_x = next_x;
-    }    
+    }
+    
+    visible_map_init(player_y, player_x);
 }
 
 int handle_battle_input(int user_input)
 {
     static choice selection = ATTACK;
     int lock = 0;
-
-    //to check for first battle frame
-    if(battle_check == 0)
-    {    
-        battle_screen_init();
-        battle_init(target_enemy_y, target_enemy_x);
-        score = 0; //reset score
-        battle_check++;
-        return 0;
-    }
 
     //check for user input
     switch(user_input) 
@@ -248,69 +237,86 @@ int handle_battle_input(int user_input)
         case '3': selection = RUN; break;
         case ENTER : lock = ENTER; break;
     }
-    
-    if (selection == INVENTORY && lock == ENTER)
-    {
-        current_gamestate = STATE_INVENTORY;
-        return selection;
-    }
 
     static battle_result outcome = BATTLE_IN_PROGRESS;
 
-    outcome = process_battle_turn(battle_check, selection, lock, target_enemy_x, target_enemy_y);
+    //main battle logic function
+    outcome = process_battle_turn(selection, lock, target_enemy_x, target_enemy_y);
 
+    //reset lock variable (makes the game less buggy)
     lock = 0;
 
-    if (outcome == BATTLE_VICTORY)
-    {
-        score = score_tracking(SCORE_FOR_DEFEATING_ENEMY); 
-        /*int *room_counter = NULL; ////////////////////////////////////
-        room_counter = position_of_room_counter(); ///////////////////
-        *room_counter = 0; //////////////////////////////////TEMPORARY*/
-        current_mapstate = STATE_STANDARD;
-        current_gamestate = STATE_MAP;
-    }
-    else if (outcome == BATTLE_DEFEAT)
-    {
-        int *room_counter = NULL;
-        room_counter = position_of_room_counter();
-        *room_counter = 0;
-        score_register();
-        reset_inventory();
-        current_mapstate = STATE_STANDARD;
-        current_gamestate = STATE_MENU;
-    }
+        
 
+    switch (outcome)
+    {
+        case BATTLE_VICTORY:
+            switch (current_mapstate)
+            {
+                case STATE_BOSS:
+                //reset room counter to 0 so it can start over again 
+                    int *room_counter = NULL;
+                    room_counter = position_of_room_counter();
+                    *room_counter = 0;
+                    score = score_tracking(SCORE_FOR_DEFEATING_BOSS);
+                    break;
+
+                default: 
+                    score = score_tracking(SCORE_FOR_DEFEATING_ENEMY);
+            }
+            //reset everything properly (MIGHT NEED TO CHANGE A BIT BECAUSE OF DEBUG STATE (PREVIOUS GAMESTATES))
+            current_mapstate = STATE_STANDARD;
+            current_gamestate = STATE_MAP;
+            break;
+
+
+        case BATTLE_DEFEAT: 
+            //reset to 0
+            int *room_counter = NULL;
+            room_counter = position_of_room_counter();
+            *room_counter = 0;
+            //set (new) highscore
+            score_register();
+            //wipe everything
+            reset_inventory();
+
+            //same as in battle victory
+            current_mapstate = STATE_STANDARD;
+            current_gamestate = STATE_MENU;
+            break;
+
+        case BATTLE_FLED: 
+            switch(current_mapstate)
+            {
+                case STATE_BOSS:
+                    break;
+                default:
+                    current_gamestate = STATE_MAP;
+            }
+            break;
+        case BATTLE_INVENTORY: 
+            current_gamestate = STATE_INVENTORY;
+            init_inventory_screen();
+            break;
+        default:
+            break;
+    }
     return selection;
 }
 
 void handle_item_input(int user_input)
 {
-    int lock = 0;
     int *max_hp_manipulator = NULL;
     int *max_strength_manipulator = NULL;
 
-    init_item_screen();
-
     switch(user_input)
     {
-        case ENTER : lock = ENTER; break;
-        case ESC : lock = ESC;
-    }
-    if (lock == ENTER)
-    {
-        switch (current_item)
-        {
-            case HEAL:
-                    inventory[inventory_track] = current_item;
-                    inventory_track++;
-                    if (inventory_track == 10)
-                    {
-                        inventory_track = 0;
-                    }
-                    break;
-        
-            case DAMAGE:
+        case ENTER :
+            switch (current_item)
+            {
+                case HEAL:
+                case POISON:
+                case DAMAGE:
                     inventory[inventory_track] = current_item;
                     inventory_track++;
                     if (inventory_track == 10)
@@ -319,30 +325,29 @@ void handle_item_input(int user_input)
                     }
                     break;
 
-            case EXTRA_STRENGTH: 
+                case EXTRA_STRENGTH: 
                     max_strength_manipulator = get_location_of(EXTRA_STRENGTH);
                     *max_strength_manipulator += EXTRA_STRENGTH_AMOUNT;
                     reset_stats();
                     break;
 
-            case EXTRA_HP: 
+                case EXTRA_HP: 
                     max_hp_manipulator = get_location_of(EXTRA_HP);
                     *max_hp_manipulator += EXTRA_HP_AMOUNT;
                     reset_stats();
                     break;
-            default: break;
-        }
-
-        map_remove_item_at(target_item_y, target_item_x);
-        current_gamestate = STATE_MAP;
-    }
-    else if (lock == ESC)
-    {
-        map_remove_item_at(target_item_y, target_item_x);
-
-        current_gamestate = STATE_MAP;
+                default: 
+                    break;
+            }
+            break;
+        case ESC :
+            break;
+        default: 
+            return;
     }
 
+    map_remove_item_at(target_item_y, target_item_x);
+    current_gamestate = STATE_MAP;
     
 }
 
@@ -350,9 +355,7 @@ int handle_inventory_input(int user_input)
 {
     static int selection = 0;
     int lock = 0;
-    int *heal_manipulator = NULL;
-    int *max_hp_ptr = NULL;
-    
+
     switch(user_input) 
     {
         case 'd': selection++; break;
@@ -391,9 +394,6 @@ int handle_inventory_input(int user_input)
     {
         current_gamestate = STATE_BATTLE;
     }
-
-    init_inventory_screen();
-
     return selection;
 }
 
