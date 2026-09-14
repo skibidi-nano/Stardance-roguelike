@@ -33,8 +33,15 @@ items random_item(void);
 void init_item_screen(void);
 void item_screen_draw(items item);
 
+
 void heal_potion(void);
 void damage_potion(void);
+
+void poison_potion(void);
+void poison_call(int turn_counter);
+void poison_enabler(bool input);
+
+
 void heal_sprite(void);
 void damage_sprite(void);
 void poison_sprite(void);

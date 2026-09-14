@@ -197,6 +197,16 @@ void map_draw(mapstate current_mapstate)
             }
             break;
 
+        case STATE_DEBUG:
+            for (int y = 0; y < MAX_HEIGHT; y++)
+            {
+                for (int x = 0; x < MAX_WIDTH; x++)
+                {
+                    mvaddch(y, x, map[y][x]);
+                }
+            }
+            break;
+
         default:
             for (int y = 0; y < current_room.height; y++)
             {
@@ -214,7 +224,6 @@ void map_draw(mapstate current_mapstate)
     
 //map_is_xxx explain themselves tbh
 
-//checks for walls
 int map_is_wall(int y, int x)
 {
     //everything outside of the map is treated as a wall

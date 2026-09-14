@@ -88,7 +88,7 @@ void item_screen_draw(items item)
             heal_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A HEALING POTION", -1);
             break;
-            
+
         case DAMAGE:
             damage_sprite();
             mvaddnstr(2, 31, "YOU'VE GOT A DAMAGE POTION", -1);
@@ -148,6 +148,47 @@ void damage_potion(void)
     }
 }
 
+void poison_potion(void)
+{
+    int *enemy_life_manipulator = NULL;
+    enemy_life_manipulator = get_location_of(DAMAGE);
+    if (*enemy_life_manipulator - POISON_AMOUNT < 0)
+    {
+        *enemy_life_manipulator = 0;
+    }
+    else
+    {
+        *enemy_life_manipulator -= POISON_AMOUNT;
+    }
+
+}
+
+void poison_enabler(bool input)
+{
+    bool* poison_manipulator = NULL;
+    poison_manipulator = get_location_of_poison();
+    *poison_manipulator = input;
+}
+
+void poison_call(int turn_counter)
+{   
+    static bool first_call = true;
+    static int initial_turn;
+    
+    if(first_call)
+    {
+        initial_turn = turn_counter;
+        first_call = false;
+    }
+
+    poison_potion();
+    if (initial_turn == turn_counter - 2)
+    {
+        poison_enabler(false);
+        first_call = true;
+    }
+}
+
 void heal_sprite(void)
 {
     mvprintw(2,  ITEM_POS_Y, "       ( (       ");
@@ -190,22 +231,22 @@ void damage_sprite(void)
 
 void poison_sprite(void)
 {
-    mvprintw(2,  50, "       ( (       ");
-    mvprintw(3,  50, "        ) )      ");
-    mvprintw(4,  50, "      .----+----.");
-    mvprintw(5,  50, "      |  _---_  |");
-    mvprintw(6,  50, "      | /     \\ |");
-    mvprintw(7,  50, "      | |  _  | |");
-    mvprintw(8,  50, "      | | (o) | |");
-    mvprintw(9,  50, "      | | /|\\ | |");
-    mvprintw(10, 50, "      | \\_   _/ |");
-    mvprintw(11, 50, "      |   \"\"    |");
-    mvprintw(12, 50, "     /           \\");
-    mvprintw(13, 50, "    |  .-------.  |");
-    mvprintw(14, 50, "    |  |o O o O|  |");
-    mvprintw(15, 50, "    |  | O o O o| |");
-    mvprintw(16, 50, "     \\ '-------' /");
-    mvprintw(17, 50, "      `---------'");
+    mvprintw(2,  ITEM_POS_Y, "       ( (       ");
+    mvprintw(3,  ITEM_POS_Y, "        ) )      ");
+    mvprintw(4,  ITEM_POS_Y, "      .----+----.");
+    mvprintw(5,  ITEM_POS_Y, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_Y, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_Y, "      | |  _  | |");
+    mvprintw(8,  ITEM_POS_Y, "      | | (o) | |");
+    mvprintw(9,  ITEM_POS_Y, "      | | /|\\ | |");
+    mvprintw(10, ITEM_POS_Y, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_Y, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_Y, "     /           \\");
+    mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_Y, "    |  |o O o O|  |");
+    mvprintw(15, ITEM_POS_Y, "    |  | O o O o| |");
+    mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_Y, "      `---------'");
 }
 
 void extra_hp_sprite(void)

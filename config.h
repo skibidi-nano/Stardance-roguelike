@@ -68,9 +68,10 @@ mapstate;
 #define MAXIMUM_ITEMS 5
 #define EXTRA_STRENGTH_AMOUNT 1
 #define EXTRA_HP_AMOUNT 2
+//for items in battle
 #define HEALING_AMOUNT 5
 #define DAMAGE_POTION_AMOUNT 4
-
+#define POISON_AMOUNT 3
 //for boss fights
 #define BOSS_ROOM_DIMENSION 11
 #define BOSS_ROOM_ACTIVATION_COUNT 5
@@ -78,5 +79,14 @@ mapstate;
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2
 #define HEALTH_BAR_POSITION_ENEMY 5
+
+//for battle log
+#define BATTLE_LOG_POSITION_X 3 //will be changed
+#define BATTLE_LOG_POSITION_Y_CURRENT 22
+#define BATTLE_LOG_POSITION_Y_PREVIOUS 24
+#define BATTLE_LOG_HEIGHT 10
+#define BATTLE_LOG_WIDTH 40
+
+#define NO_DAMAGE_INPUT 0
 
 #endif

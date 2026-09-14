@@ -14,6 +14,7 @@ Key features of the game:
   - Stronger enemies and boss fights
   - Enemies that get stronger and stronger
   - Items to use in battle
+  - A log to see what happened in battle
 
 
 DEMO URL:

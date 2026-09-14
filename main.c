@@ -386,6 +386,11 @@ int handle_inventory_input(int user_input)
                 inventory[selection] = EMPTY;
                 break;
 
+            case POISON : 
+                poison_enabler(true);
+                inventory[selection] = EMPTY;
+                break;
+
             default : break;
         }
         current_gamestate = STATE_BATTLE;
