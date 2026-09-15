@@ -4,6 +4,7 @@
 #include "menu.h"
 #include "map.h"
 #include "battle_screen.h"
+#include "battle_log.h"
 #include "config.h"
 #include "highscore.h"
 #include "item.h"
@@ -11,8 +12,6 @@
 #include "generation.h"
 
 
-void map_refresh(int player_y, int player_x);
-void boss_map_refresh(int player_refresh_y, int player_refresh_x);
 void handle_menu_input(int user_input);
 void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
@@ -41,7 +40,7 @@ items inventory[INVENTORY_SIZE];
 //for states
     //for gamestate changes
 gamestate current_gamestate = STATE_MENU;
-    //mainly for debug and boss
+    //for handling which kind of map should be printed
 mapstate current_mapstate = STATE_STANDARD;
 
 int main(void)
@@ -70,7 +69,7 @@ int main(void)
     while ((user_input = getch()) != 'q')
     {
 
-        static int selection = 0;
+        static selection selection = {.inventory = 0, .battle = 0};
 
         switch (current_gamestate)
         {
@@ -82,11 +81,11 @@ int main(void)
                 handle_map_input(user_input);
                 break;
             case STATE_BATTLE:
-                selection = handle_battle_input(user_input);
+                selection.battle = handle_battle_input(user_input);
                 break;
 
             case STATE_INVENTORY:
-                selection = handle_inventory_input(user_input);
+                selection.inventory = handle_inventory_input(user_input);
                 break;
 
             case STATE_ITEM:
@@ -102,11 +101,11 @@ int main(void)
                 break;
 
             case STATE_MAP:
-                map_refresh(player_y, player_x);
+                map_refresh(player_y, player_x, current_mapstate);
                 break;
 
             case STATE_BATTLE:
-                battle_screen_draw(selection);
+                battle_screen_draw (selection.battle);
                 break;
 
             case STATE_ITEM:
@@ -114,7 +113,7 @@ int main(void)
                 break;
 
             case STATE_INVENTORY:
-                inventory_screen_draw(selection, inventory);
+                inventory_screen_draw(selection.inventory, inventory);
         }
 
         refresh();
@@ -123,15 +122,6 @@ int main(void)
     endwin();
 
     return 0;
-}
-
-//refreshes the game (duh)
-void map_refresh(int player_refresh_y, int player_refresh_x)
-{
-    clear();
-    map_draw(current_mapstate);
-    mvaddch(player_refresh_y, player_refresh_x, '@');
-    refresh();
 }
 
 void handle_menu_input(int user_input)
@@ -153,6 +143,7 @@ void handle_menu_input(int user_input)
             player_y = 1;
             player_x = 1;
             current_gamestate = STATE_MAP; 
+        //case '3': controls screen
 
 
     }
@@ -226,22 +217,23 @@ void handle_map_input(int user_input)
 
 int handle_battle_input(int user_input)
 {
-    static choice selection = ATTACK;
+    static choice battle_selection = ATTACK;
     int lock = 0;
 
     //check for user input
     switch(user_input) 
     {
-        case '1': selection = ATTACK; break;
-        case '2': selection = INVENTORY; break;
-        case '3': selection = RUN; break;
+        case '1': battle_selection = ATTACK; break;
+        case '2': battle_selection = INVENTORY; break;
+        case '3': battle_selection = RUN; break;
         case ENTER : lock = ENTER; break;
+        default: battle_selection = ATTACK; break;
     }
 
     static battle_result outcome = BATTLE_IN_PROGRESS;
 
     //main battle logic function
-    outcome = process_battle_turn(selection, lock, target_enemy_x, target_enemy_y);
+    outcome = process_battle_turn(battle_selection, lock, target_enemy_x, target_enemy_y);
 
     //reset lock variable (makes the game less buggy)
     lock = 0;
@@ -250,6 +242,7 @@ int handle_battle_input(int user_input)
 
     switch (outcome)
     {
+
         case BATTLE_VICTORY:
             switch (current_mapstate)
             {
@@ -285,6 +278,7 @@ int handle_battle_input(int user_input)
             current_gamestate = STATE_MENU;
             break;
 
+
         case BATTLE_FLED: 
             switch(current_mapstate)
             {
@@ -294,14 +288,18 @@ int handle_battle_input(int user_input)
                     current_gamestate = STATE_MAP;
             }
             break;
+
+
         case BATTLE_INVENTORY: 
             current_gamestate = STATE_INVENTORY;
             init_inventory_screen();
             break;
+
+
         default:
             break;
     }
-    return selection;
+    return battle_selection;
 }
 
 void handle_item_input(int user_input)
@@ -353,42 +351,48 @@ void handle_item_input(int user_input)
 
 int handle_inventory_input(int user_input)
 {
-    static int selection = 0;
+    static int inventory_selection = 0;
     int lock = 0;
 
     switch(user_input) 
     {
-        case 'd': selection++; break;
-        case 'a': selection--; break;
+        case 'd': inventory_selection++; break;
+        case 'a': inventory_selection--; break;
         case ENTER: lock = ENTER; break;
         case ESC: lock = ESC; break;
     }
 
-    if (selection < 0)
+    if (inventory_selection < 0)
     {
-        selection = INVENTORY_SIZE - 1;
+        inventory_selection = INVENTORY_SIZE - 1;
     }
-    else if (selection > INVENTORY_SIZE)
+    else if (inventory_selection > INVENTORY_SIZE)
     {
-        selection = 0;
+        inventory_selection = 0;
     }
 
-    if (lock == ENTER && inventory[selection] != EMPTY)
+    if (lock == ENTER && inventory[inventory_selection] != EMPTY)
     {
-        switch (inventory[selection])
+        switch (inventory[inventory_selection])
         {
             case HEAL : 
                 heal_potion();
-                inventory[selection] = EMPTY;
+                inventory[inventory_selection] = EMPTY;
+
+                call_battle_log(PLAYER_HEAL_USE, NO_DAMAGE_INPUT);
                 break;
             case DAMAGE :
                 damage_potion();
-                inventory[selection] = EMPTY;
+                inventory[inventory_selection] = EMPTY;
+
+                call_battle_log(PLAYER_DAMAGE_USE, NO_DAMAGE_INPUT);
                 break;
 
             case POISON : 
                 poison_enabler(true);
-                inventory[selection] = EMPTY;
+                inventory[inventory_selection] = EMPTY;
+
+                call_battle_log(PLAYER_POISON_USE, NO_DAMAGE_INPUT);
                 break;
 
             default : break;
@@ -399,7 +403,7 @@ int handle_inventory_input(int user_input)
     {
         current_gamestate = STATE_BATTLE;
     }
-    return selection;
+    return inventory_selection;
 }
 
 void reset_inventory(void)

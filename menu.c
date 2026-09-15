@@ -36,10 +36,15 @@ void menu_draw(void)
         }
     }
 
+    mvprintw(2, 16, " -> POINTER FIGHTER <- ");
+    mvprintw(3, 16, "=======================");
+    mvprintw(4, 16, "[*]  *p = &VICTORY  [*]");
+
     int highscore = get_highscore();
-    mvprintw(2, 13, "CURRENT HIGHSCORE: %i", highscore);
-    mvprintw(4, 19, "[1] START GAME");
-    mvprintw(5, 19, "[2] START DEBUG MODE");
-    mvprintw(6, 19, "[q] QUIT GAME");
+
+    mvprintw(6, 16, "CURRENT HIGHSCORE: %i", highscore);
+    mvprintw(8, 19, "[1] START GAME");
+    mvprintw(9, 19, "[2] START DEBUG MODE");
+    mvprintw(10, 19, "[q] QUIT GAME");
 
 }

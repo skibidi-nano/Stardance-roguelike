@@ -61,6 +61,13 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
         if(poison)
         {
             poison_call(enemy_turn_counter);
+            battle_log(POISON_POTION_TICK, POISON_AMOUNT, log_arr);
+            if (enemy_ptr->current_hp <= 0)
+            {
+                map_remove_enemy_at(enemy_y, enemy_x); //killing the enemy
+                reset_stats();
+                return BATTLE_VICTORY;
+            }
         }
 
         enemy_turn_counter++;
@@ -98,7 +105,7 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
                     int n = get_random_int(1, 3);
                     if(!(n % 2))
                     {
-                    return BATTLE_FLED;
+                        return BATTLE_FLED;
                     }
                     else
                     {
@@ -131,7 +138,7 @@ void battle_init(int enemy_y, int enemy_x)
 void battle_screen_init(void)
 {
     battle_log_init();
-    
+
     for (int y = 0; y < BATTLE_SCREEN_HEIGHT; y++)
     {
         for (int x = 0; x < BATTLE_SCREEN_WIDTH; x++)
@@ -229,7 +236,10 @@ void battle_screen_draw(choice selection)
     {
         for (int x = 0; x < BATTLE_LOG_WIDTH; x++)
         {
-            mvaddch(y + BATTLE_LOG_POSITION_Y_CURRENT, x + BATTLE_LOG_POSITION_X, log_arr[y][x]);
+            if (log_arr[y][x] != '\0') //fix for ^ symbol in the logs
+            {
+                mvaddch(y + BATTLE_LOG_POSITION_Y_CURRENT, x + BATTLE_LOG_POSITION_X, log_arr[y][x]);
+            }
         }
     }
     
@@ -302,4 +312,9 @@ int* get_location_of(items item) //need to rewrite    ps:not sure tho probably j
 bool* get_location_of_poison(void)
 {
     return &poison;
+}
+
+void call_battle_log(actions input_one, int input_two)
+{
+    battle_log(input_one, input_two, log_arr);
 }

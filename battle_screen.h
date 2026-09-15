@@ -1,4 +1,5 @@
 #include "item.h"
+#include "battle_log.h"
 
 typedef enum
 {
@@ -36,3 +37,4 @@ entity stats_enemy(type type);
 
 int* get_location_of(items item);
 bool* get_location_of_poison(void);
+void call_battle_log(actions input_one, int input_two);

@@ -21,9 +21,16 @@ typedef enum
 }
 mapstate;
 
+typedef struct
+{
+    int inventory;
+    int battle;
+}
+selection;
+
 //for menu size (pls dont change)
 #define MENU_WIDTH 56
-#define MENU_HEIGHT 10
+#define MENU_HEIGHT 13
 
 //For map gen
 #define MAX_WIDTH 50
@@ -84,7 +91,7 @@ mapstate;
 #define BATTLE_LOG_POSITION_X 3 //will be changed
 #define BATTLE_LOG_POSITION_Y_CURRENT 22
 #define BATTLE_LOG_POSITION_Y_PREVIOUS 24
-#define BATTLE_LOG_HEIGHT 10
+#define BATTLE_LOG_HEIGHT 7
 #define BATTLE_LOG_WIDTH 40
 
 #define NO_DAMAGE_INPUT 0

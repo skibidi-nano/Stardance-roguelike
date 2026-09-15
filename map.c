@@ -174,12 +174,26 @@ void visible_map_init(int player_y, int player_x)
     {
         for (int x = -8; x < 8; x++)
         {
-            if ((player_y + y) < MAX_HEIGHT || (player_x + x) < MAX_WIDTH || (player_y + y ) > 0 || (player_x + x > 0))
+            if ((player_y + y) < MAX_HEIGHT && (player_x + x) < MAX_WIDTH && (player_y + y ) >= 0 && (player_x + x >= 0))
             {
                 visible_map[player_y + y][player_x + x] = map[player_y + y][player_x + x];
             }
         }
     }
+
+
+    for (int y = 0; y < current_room.height; y++)
+    {
+        for (int x = 0; x < current_room.width; x++)
+        {
+            if (visible_map[y][x] != map[y][x] && visible_map[y][x] != '#')
+            {
+                visible_map[y][x] = map[y][x];
+            }
+        }
+    }
+
+    
 }
 
 //puts the map on the screen
@@ -222,6 +236,16 @@ void map_draw(mapstate current_mapstate)
     }
 }
     
+//refreshes the game (duh)
+void map_refresh(int player_refresh_y, int player_refresh_x, mapstate current_mapstate)
+{
+    clear();
+    map_draw(current_mapstate);
+    mvaddch(player_refresh_y, player_refresh_x, '@');
+    refresh();
+}
+
+
 //map_is_xxx explain themselves tbh
 
 int map_is_wall(int y, int x)

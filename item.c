@@ -86,36 +86,36 @@ void item_screen_draw(items item)
     {
         case HEAL:
             heal_sprite();
-            mvaddnstr(2, 31, "YOU'VE GOT A HEALING POTION", -1);
+            mvaddnstr(1, 31, "YOU'VE GOT A HEALING POTION", -1);
             break;
 
         case DAMAGE:
             damage_sprite();
-            mvaddnstr(2, 31, "YOU'VE GOT A DAMAGE POTION", -1);
+            mvaddnstr(1, 31, "YOU'VE GOT A DAMAGE POTION", -1);
             break;
 
         case POISON:
             poison_sprite();
-            mvaddnstr(2, 31, "YOU'VE GOT A POISON POTION", -1);
+            mvaddnstr(1, 31, "YOU'VE GOT A POISON POTION", -1);
             break;
 
         case EXTRA_STRENGTH:
             extra_strength_sprite();
-            mvaddnstr(2, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
+            mvaddnstr(1, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
             break;
 
         case EXTRA_HP:
             extra_hp_sprite();
-            mvaddnstr(2, 31, "YOU'VE GOT AN EXTRA HP ENCHANTMENT", -1);
+            mvaddnstr(1, 31, "YOU'VE GOT AN EXTRA HP ENCHANTMENT", -1);
             break;
 
         default:
             break;
     }
 
-    mvaddnstr(18, 31, "PRESS \"ESCAPE\" TO RETURN", -1);
+    mvaddnstr(19, 31, "PRESS \"ESCAPE\" TO RETURN", -1);
 
-    mvaddnstr(19, 31, "PRESS \"ENTER\" TO PICK UP", -1);
+    mvaddnstr(20, 31, "PRESS \"ENTER\" TO PICK UP", -1);
 }
 
 void heal_potion(void)
