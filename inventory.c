@@ -2,6 +2,7 @@
 #include "inventory.h"
 #include "config.h"
 #include "item.h"
+#include "map.h"
 
 //need to make the frame drawing logic a bit better with macros and overall needs to be done a tad bit better
 
@@ -88,6 +89,13 @@ void print_frame_select(items item, int position_y, int position_x)
             mvprintw(3, 5, "DEALS 2 HP OF DAMAGE TO YOUR OPPONENT FOR 3 ROUNDS");
             break;
 
+        case BOSS_ITEM:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+****+ <<<");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            mvprintw(3, 5, "MAKES YOU IMMUNE TO DAMAGE FOR ONE TURN");
+            break;
+
         case EMPTY:
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+    + <<<");
@@ -123,6 +131,12 @@ void print_frame_not_select(items item, int position_y, int position_x)
 
             break;
 
+        case BOSS_ITEM:
+            mvprintw(position_y,  position_x, "++++++");
+            mvprintw(position_y + 1,  position_x, "+****+");
+            mvprintw(position_y + 2,  position_x, "++++++");
+            break;
+
         case EMPTY:
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+    +");
@@ -132,4 +146,25 @@ void print_frame_not_select(items item, int position_y, int position_x)
         default:
             break;
     }
+}
+
+pass assign_item_to_inventory(items inventory[INVENTORY_SIZE], items current_item)
+{
+    int item_check = 0;
+    for (int i = 0; i < INVENTORY_SIZE; i++)
+    {
+        if (inventory[i] == EMPTY)
+        {
+            inventory[i] = current_item;
+            item_check++;
+            return ENTER_LEGAL;
+        }
+    }
+
+    if (item_check  == 0 && current_item == BOSS_ITEM)
+    {
+        inventory[0] = current_item;
+    }
+
+    return ENTER_ILLEGAL;
 }

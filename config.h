@@ -9,6 +9,7 @@ typedef enum
     STATE_MENU,
     STATE_ITEM,
     STATE_INVENTORY,
+    STATE_CONTROLS
 } 
 gamestate;
 
@@ -30,7 +31,8 @@ selection;
 
 //for menu size (pls dont change)
 #define MENU_WIDTH 56
-#define MENU_HEIGHT 13
+#define MENU_HEIGHT 14
+
 
 //For map gen
 #define MAX_WIDTH 50
@@ -68,7 +70,7 @@ selection;
 #define SCORE_FOR_DEFEATING_BOSS 5
 
 //for item position
-#define ITEM_POS_Y 30
+#define ITEM_POS_X 30
 
 //for items in main loop
 #define INVENTORY_SIZE 10
@@ -82,6 +84,7 @@ selection;
 //for boss fights
 #define BOSS_ROOM_DIMENSION 11
 #define BOSS_ROOM_ACTIVATION_COUNT 5
+#define BOSS_POSITION 5
 
 //for health bar
 #define HEALTH_BAR_POSITION_PLAYER 2

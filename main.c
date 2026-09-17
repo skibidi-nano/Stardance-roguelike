@@ -13,6 +13,8 @@
 
 
 void handle_menu_input(int user_input);
+void controls_screen(void);
+void handle_controls_screen_input(int user_input);
 void handle_map_input(int user_input);
 int handle_battle_input(int user_input);
 void handle_item_input(int user_input);
@@ -33,7 +35,7 @@ int target_item_x;
 int score = 0;
 
 //for items and inventory
-int inventory_track = 0;
+bool inventory_full = false;
 items current_item;
 items inventory[INVENTORY_SIZE];
 
@@ -90,6 +92,11 @@ int main(void)
 
             case STATE_ITEM:
                 handle_item_input(user_input);
+                break;
+            
+            case STATE_CONTROLS:
+                handle_controls_screen_input(user_input);
+                break;
         }
 
         clear();
@@ -109,11 +116,15 @@ int main(void)
                 break;
 
             case STATE_ITEM:
-                item_screen_draw(current_item);
+                item_screen_draw(current_item, inventory_full);
                 break;
 
             case STATE_INVENTORY:
                 inventory_screen_draw(selection.inventory, inventory);
+                break;
+            
+            case STATE_CONTROLS:
+                controls_screen();
         }
 
         refresh();
@@ -143,9 +154,30 @@ void handle_menu_input(int user_input)
             player_y = 1;
             player_x = 1;
             current_gamestate = STATE_MAP; 
-        //case '3': controls screen
+            break;
+        case '3': //controls screen
+            current_gamestate = STATE_CONTROLS;
 
 
+    }
+}
+
+void controls_screen(void)
+{
+    mvprintw(1, 1, "Controls screen, press ESC to exit");
+    mvprintw(2, 1, "MOVEMENT: WASD");
+    mvprintw(3, 1, "QUIT GAME AT ANY TIME: q");
+    mvprintw(4, 1, "BATTLE: 1, 2 OR 3, PRESS ENTER TO SELECT");
+    mvprintw(5, 1, "INVENTORY: A OR D, PRESS ENTER TO SELECT");
+
+}
+
+void handle_controls_screen_input(int user_input)
+{
+    switch(user_input)
+    {
+        case ESC: current_gamestate = STATE_MENU; menu_init(); break;
+        default: break;
     }
 }
 
@@ -164,10 +196,10 @@ void handle_map_input(int user_input)
         case 'd': next_x++; break;
     }
 
-    enemy_pursuit(player_y, player_x);
+    enemy_pursuit(player_y, player_x, current_mapstate);
 
     //door collision check
-    if ((boss_room_check = map_is_door(next_y, next_x)))
+    if ((boss_room_check = map_is_door(next_y, next_x, &current_mapstate)))
     {
         //door logic doubles as boss trigger logic
         switch (boss_room_check)
@@ -203,6 +235,14 @@ void handle_map_input(int user_input)
         target_item_x = next_x;
         current_item = random_item(); //generate item every time a player collides with an item
         current_gamestate = STATE_ITEM;
+        init_item_screen();
+    }
+    else if(map_is_boss_item(next_y, next_x))
+    {
+        target_item_y = next_y;
+        target_item_x = next_x;
+        current_gamestate = STATE_ITEM;
+        current_item = BOSS_ITEM;
         init_item_screen();
     }
     //player-wall collision check
@@ -252,22 +292,29 @@ int handle_battle_input(int user_input)
                     room_counter = position_of_room_counter();
                     *room_counter = 0;
                     score = score_tracking(SCORE_FOR_DEFEATING_BOSS);
+                    boss_item_creation();
                     break;
 
                 default: 
                     score = score_tracking(SCORE_FOR_DEFEATING_ENEMY);
+                    current_mapstate = STATE_STANDARD;
             }
-            //reset everything properly (MIGHT NEED TO CHANGE A BIT BECAUSE OF DEBUG STATE (PREVIOUS GAMESTATES))
-            current_mapstate = STATE_STANDARD;
+            //reset everything properly
             current_gamestate = STATE_MAP;
             break;
 
 
         case BATTLE_DEFEAT: 
-            //reset to 0
+            //reset room counter to 0
             int *room_counter = NULL;
             room_counter = position_of_room_counter();
             *room_counter = 0;
+            
+            //reset boss counter to 0
+            int *boss_counter = NULL;
+            boss_counter = position_of_boss_counter();
+            *boss_counter = 0;
+
             //set (new) highscore
             score_register();
             //wipe everything
@@ -306,6 +353,7 @@ void handle_item_input(int user_input)
 {
     int *max_hp_manipulator = NULL;
     int *max_strength_manipulator = NULL;
+    pass check = ENTER_ILLEGAL;
 
     switch(user_input)
     {
@@ -313,39 +361,51 @@ void handle_item_input(int user_input)
             switch (current_item)
             {
                 case HEAL:
-                case POISON:
                 case DAMAGE:
-                    inventory[inventory_track] = current_item;
-                    inventory_track++;
-                    if (inventory_track == 10)
-                    {
-                        inventory_track = 0;
-                    }
+                case POISON:
+                case BOSS_ITEM:
+                    check = assign_item_to_inventory(inventory, current_item);
                     break;
 
                 case EXTRA_STRENGTH: 
                     max_strength_manipulator = get_location_of(EXTRA_STRENGTH);
                     *max_strength_manipulator += EXTRA_STRENGTH_AMOUNT;
                     reset_stats();
+                    check = ENTER_LEGAL;
                     break;
 
                 case EXTRA_HP: 
                     max_hp_manipulator = get_location_of(EXTRA_HP);
                     *max_hp_manipulator += EXTRA_HP_AMOUNT;
                     reset_stats();
+                    check = ENTER_LEGAL;
                     break;
+
                 default: 
                     break;
             }
             break;
         case ESC :
+            check = ENTER_ESC;
             break;
         default: 
             return;
     }
 
-    map_remove_item_at(target_item_y, target_item_x);
-    current_gamestate = STATE_MAP;
+    switch (check)
+    {
+        case ENTER_ESC:
+        case ENTER_LEGAL:
+            map_remove_item_at(target_item_y, target_item_x);
+            visible_map_init(player_y, player_x);
+            current_gamestate = STATE_MAP;
+            break;
+        
+        case ENTER_ILLEGAL:
+            inventory_full = true;
+            break;
+    }
+    
     
 }
 
@@ -393,6 +453,16 @@ int handle_inventory_input(int user_input)
                 inventory[inventory_selection] = EMPTY;
 
                 call_battle_log(PLAYER_POISON_USE, NO_DAMAGE_INPUT);
+                break;
+
+            case BOSS_ITEM:
+                bool *boss_item_enabler = NULL;
+                boss_item_enabler = get_location_of_boss_bool();
+                *boss_item_enabler = true;
+
+                inventory[inventory_selection] = EMPTY;
+
+                call_battle_log(PLAYER_BOSS_ITEM_USE, NO_DAMAGE_INPUT);
                 break;
 
             default : break;

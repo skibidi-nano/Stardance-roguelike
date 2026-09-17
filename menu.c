@@ -45,6 +45,7 @@ void menu_draw(void)
     mvprintw(6, 16, "CURRENT HIGHSCORE: %i", highscore);
     mvprintw(8, 19, "[1] START GAME");
     mvprintw(9, 19, "[2] START DEBUG MODE");
-    mvprintw(10, 19, "[q] QUIT GAME");
+    mvprintw(10,19, "[3] CONTROLS SCREEN");
+    mvprintw(11, 19, "[q] QUIT GAME");
 
 }

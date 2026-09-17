@@ -37,4 +37,5 @@ entity stats_enemy(type type);
 
 int* get_location_of(items item);
 bool* get_location_of_poison(void);
+bool* get_location_of_boss_bool(void);
 void call_battle_log(actions input_one, int input_two);

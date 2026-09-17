@@ -27,6 +27,7 @@ static int enemy_turn_counter = 0; //for poison potion
 static int player_turn_counter = 0; //for [COMING SOON]
 
 static bool poison = false;
+static bool boss_item = false;
 
 
 battle_result process_battle_turn(choice selection, int lock, int enemy_x, int enemy_y)
@@ -45,19 +46,28 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
     //ENEMY LOGIC
     if (current_turn == TURN_ENEMY)
     {
-        // Enemy attacks player
-        int enemy_damage = enemy_ptr->attack_power * get_random_int(1, 3); //for random damage
-        player_ptr->current_hp -=  enemy_damage;
-
-        battle_log(ENEMY_ATTACK, NO_DAMAGE_INPUT, log_arr);
-        battle_log(PLAYER_DAMAGE_TOOK, enemy_damage, log_arr);
-
-        if (player_ptr->current_hp <= 0)
+        
+        if (!boss_item) //if boss item is activated the enemy cant attack
         {
-            reset_stats();
-            return BATTLE_DEFEAT;
+            // Enemy attacks player
+            int enemy_damage = enemy_ptr->attack_power * get_random_int(1, 3); //for random damage
+            player_ptr->current_hp -=  enemy_damage;
+
+            battle_log(ENEMY_ATTACK, NO_DAMAGE_INPUT, log_arr);
+            battle_log(PLAYER_DAMAGE_TOOK, enemy_damage, log_arr);
+
+            if (player_ptr->current_hp <= 0)
+            {
+                reset_stats();
+                return BATTLE_DEFEAT;
+            }
+        }
+        else
+        {
+            boss_item = false;
         }
 
+        
         if(poison)
         {
             poison_call(enemy_turn_counter);
@@ -276,7 +286,7 @@ entity stats_enemy(type type)
         case ADDRESS: //stats for standard enemies
             current_enemy.max_hp = 20 + value_of_boss_counter();
             current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 3 + (2 * value_of_boss_counter());
+            current_enemy.attack_power = 2 + (2 * value_of_boss_counter());
             current_enemy.type = ADDRESS;
             break;
         case MODULO: //stats for special enemies
@@ -288,7 +298,7 @@ entity stats_enemy(type type)
         case BOSS:
             current_enemy.max_hp = 25 + (2 * value_of_boss_counter());
             current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 2 * value_of_boss_counter();
+            current_enemy.attack_power = 3 + (2 * value_of_boss_counter());
             current_enemy.type = BOSS;
 
 
@@ -312,6 +322,11 @@ int* get_location_of(items item) //need to rewrite    ps:not sure tho probably j
 bool* get_location_of_poison(void)
 {
     return &poison;
+}
+
+bool* get_location_of_boss_bool(void)
+{
+    return &boss_item;
 }
 
 void call_battle_log(actions input_one, int input_two)

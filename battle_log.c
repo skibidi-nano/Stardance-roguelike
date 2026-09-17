@@ -67,6 +67,10 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
             snprintf(msg, sizeof(msg), str);
             break;
 
+        case PLAYER_BOSS_ITEM_USE:
+            str = "YOU USED A BOSS POTION";
+            snprintf(msg, sizeof(msg), str);
+            break;
 
         case POISON_POTION_TICK:
             str = "POISON DID %i DAMAGE TO YOUR OPPONENT";
@@ -121,6 +125,11 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
 
         case PLAYER_POISON_USE:
             str = "YOU USED A POISON POTION";
+            snprintf(msg, sizeof(msg), str);
+            break;
+
+        case PLAYER_BOSS_ITEM_USE:
+            str = "YOU USED A BOSS POTION";
             snprintf(msg, sizeof(msg), str);
             break;
 

@@ -5,6 +5,7 @@
 #include "generation.h"
 #include "npc.h"
 #include "item.h"
+#include "battle_screen.h"
 
 
 static char map[MAX_HEIGHT][MAX_WIDTH];
@@ -130,7 +131,9 @@ void map_init(mapstate current_mapstate)
             for (int i = 0; i < 10; i++)
             {
                 map[4][i] = '+';
+                map[5][i] = '+';
             }
+            map[6][1] = '?';
             break;
 
         case STATE_BOSS:
@@ -163,7 +166,7 @@ void map_init(mapstate current_mapstate)
             }
 
             //boss and door
-            map[5][5] = '*';
+            map[BOSS_POSITION][BOSS_POSITION] = '*';
             map[0][6] = '0';
     }
 }
@@ -262,7 +265,7 @@ int map_is_wall(int y, int x)
     return map[y][x] == '#';
 }
 
-int map_is_door(int y, int x)
+int map_is_door(int y, int x, mapstate *current_mapstate)
 {
     if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width || enemy_counter != 0)
     {
@@ -272,10 +275,14 @@ int map_is_door(int y, int x)
     {
         return BOSS_ROOM_ACTIVATION_COUNT;
     }
-    else
+    else if (*current_mapstate == STATE_BOSS && room_enemies[0].active == false && map[y][x] == '0')
     {
-        return map[y][x] == '0';
+        map_init(*current_mapstate);
+        *current_mapstate = STATE_STANDARD;
     }
+
+    return map[y][x] == '0';
+
 }
 
 int map_is_enemy(int y, int x)
@@ -296,9 +303,18 @@ int map_is_item(int y, int x)
     
     if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
     {
-        return 1; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items), only works when tweaking wall logic
+        return 0; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items), only works when tweaking wall logic
     }
     return map[y][x] == '+';
+}
+
+int map_is_boss_item(int y, int x)
+{
+    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
+    {
+        return 0; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items), only works when tweaking wall logic
+    }
+    return map[y][x] == '?';
 }
 
 void map_remove_enemy_at(int y, int x) 
@@ -315,6 +331,8 @@ void map_remove_enemy_at(int y, int x)
             break;
         }
     }
+
+    visible_map_init(y, x);
 }
 
 void map_remove_item_at(int y, int x) 
@@ -332,13 +350,13 @@ void map_remove_item_at(int y, int x)
     }
 }
 
-void enemy_pursuit(int player_y, int player_x)
+void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
 {
     direction dir;
     
     for (int i = 0; i < MAX_NUMBER_OF_NPCS; i++)
     {   
-        if (room_enemies[i].active == true)
+        if (room_enemies[i].active == true && current_mapstate != STATE_BOSS)
         {
             int dy = player_y - room_enemies[i].npc_y;
             int dx = player_x - room_enemies[i].npc_x;
@@ -398,8 +416,10 @@ int signum(int input)
     return 0;
 }
 
-
-
+void boss_item_creation(void)
+{
+    map[BOSS_POSITION][BOSS_POSITION] = '?';
+}
 
 //pretty self explandatory functions
 npc* position_of_enemy_array(void)
@@ -410,6 +430,11 @@ npc* position_of_enemy_array(void)
 int* position_of_room_counter(void)
 {
     return &room_counter;
+}
+
+int* position_of_boss_counter(void)
+{
+    return &boss_counter;
 }
 
 char value_of_part_of_map(int y, int x)

@@ -75,7 +75,7 @@ void init_item_screen(void)
     memset(item_screen, ' ', sizeof(item_screen));
 }
 
-void item_screen_draw(items item)
+void item_screen_draw(items item, bool inventory_full)
 {
     for (int y = 0; y < ITEM_SCREEN_HEIGHT; y++)
     {
@@ -99,6 +99,11 @@ void item_screen_draw(items item)
             mvaddnstr(1, 31, "YOU'VE GOT A POISON POTION", -1);
             break;
 
+        case BOSS_ITEM:
+            boss_item_sprite();
+            mvaddnstr(1, 31, "YOU'VE GOT THE BOSS POTION", -1);
+            break;
+
         case EXTRA_STRENGTH:
             extra_strength_sprite();
             mvaddnstr(1, 31, "YOU'VE GOT A STRENGTH GAUNTLET", -1);
@@ -111,6 +116,11 @@ void item_screen_draw(items item)
 
         default:
             break;
+    }
+
+    if (inventory_full)
+    {
+        mvaddnstr(9, ITEM_POS_X, "!! INVENTORY FULL, PRESS ESC !!", -1);
     }
 
     mvaddnstr(19, 31, "PRESS \"ESCAPE\" TO RETURN", -1);
@@ -191,94 +201,115 @@ void poison_call(int turn_counter)
 
 void heal_sprite(void)
 {
-    mvprintw(2,  ITEM_POS_Y, "       ( (       ");
-    mvprintw(3,  ITEM_POS_Y, "        ) )      ");
-    mvprintw(4,  ITEM_POS_Y, "      .----+----.");
-    mvprintw(5,  ITEM_POS_Y, "      |  _---_  |");
-    mvprintw(6,  ITEM_POS_Y, "      | /     \\ |");
-    mvprintw(7,  ITEM_POS_Y, "      | |  |  | |");
-    mvprintw(8,  ITEM_POS_Y, "      | | -+- | |");
-    mvprintw(9,  ITEM_POS_Y, "      | |  |  | |");
-    mvprintw(10, ITEM_POS_Y, "      | \\_   _/ |");
-    mvprintw(11, ITEM_POS_Y, "      |   \"\"    |");
-    mvprintw(12, ITEM_POS_Y, "     /           \\");
-    mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
-    mvprintw(14, ITEM_POS_Y, "    |  |~~~~~~~|  |");
-    mvprintw(15, ITEM_POS_Y, "    |  |~~~~~~~|  |");
-    mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
-    mvprintw(17, ITEM_POS_Y, "      `---------'");
+    mvprintw(2,  ITEM_POS_X, "       ( (       ");
+    mvprintw(3,  ITEM_POS_X, "        ) )      ");
+    mvprintw(4,  ITEM_POS_X, "      .----+----.");
+    mvprintw(5,  ITEM_POS_X, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_X, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_X, "      | |  |  | |");
+    mvprintw(8,  ITEM_POS_X, "      | | -+- | |");
+    mvprintw(9,  ITEM_POS_X, "      | |  |  | |");
+    mvprintw(10, ITEM_POS_X, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_X, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_X, "     /           \\");
+    mvprintw(13, ITEM_POS_X, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_X, "    |  |~~~~~~~|  |");
+    mvprintw(15, ITEM_POS_X, "    |  |~~~~~~~|  |");
+    mvprintw(16, ITEM_POS_X, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_X, "      `---------'");
 }
 
 void damage_sprite(void)
 {
-    mvprintw(2,  ITEM_POS_Y, "       ( (       ");
-    mvprintw(3,  ITEM_POS_Y, "        ) )      ");
-    mvprintw(4,  ITEM_POS_Y, "      .----+----.");
-    mvprintw(5,  ITEM_POS_Y, "      |  _---_  |");
-    mvprintw(6,  ITEM_POS_Y, "      | /     \\ |");
-    mvprintw(7,  ITEM_POS_Y, "      | | (o) | |");
-    mvprintw(8,  ITEM_POS_Y, "      | | / \\ | |");
-    mvprintw(9,  ITEM_POS_Y, "      | |  ~  | |");
-    mvprintw(10, ITEM_POS_Y, "      | \\_   _/ |");
-    mvprintw(11, ITEM_POS_Y, "      |   \"\"    |");
-    mvprintw(12, ITEM_POS_Y, "     /           \\");
-    mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
-    mvprintw(14, ITEM_POS_Y, "    |  |x x x x|  |");
-    mvprintw(15, ITEM_POS_Y, "    |  |x x x x|  |");
-    mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
-    mvprintw(17, ITEM_POS_Y, "      `---------'");
+    mvprintw(2,  ITEM_POS_X, "       ( (       ");
+    mvprintw(3,  ITEM_POS_X, "        ) )      ");
+    mvprintw(4,  ITEM_POS_X, "      .----+----.");
+    mvprintw(5,  ITEM_POS_X, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_X, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_X, "      | | (o) | |");
+    mvprintw(8,  ITEM_POS_X, "      | | / \\ | |");
+    mvprintw(9,  ITEM_POS_X, "      | |  ~  | |");
+    mvprintw(10, ITEM_POS_X, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_X, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_X, "     /           \\");
+    mvprintw(13, ITEM_POS_X, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_X, "    |  |x x x x|  |");
+    mvprintw(15, ITEM_POS_X, "    |  |x x x x|  |");
+    mvprintw(16, ITEM_POS_X, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_X, "      `---------'");
 }
 
 void poison_sprite(void)
 {
-    mvprintw(2,  ITEM_POS_Y, "       ( (       ");
-    mvprintw(3,  ITEM_POS_Y, "        ) )      ");
-    mvprintw(4,  ITEM_POS_Y, "      .----+----.");
-    mvprintw(5,  ITEM_POS_Y, "      |  _---_  |");
-    mvprintw(6,  ITEM_POS_Y, "      | /     \\ |");
-    mvprintw(7,  ITEM_POS_Y, "      | |  _  | |");
-    mvprintw(8,  ITEM_POS_Y, "      | | (o) | |");
-    mvprintw(9,  ITEM_POS_Y, "      | | /|\\ | |");
-    mvprintw(10, ITEM_POS_Y, "      | \\_   _/ |");
-    mvprintw(11, ITEM_POS_Y, "      |   \"\"    |");
-    mvprintw(12, ITEM_POS_Y, "     /           \\");
-    mvprintw(13, ITEM_POS_Y, "    |  .-------.  |");
-    mvprintw(14, ITEM_POS_Y, "    |  |o O o O|  |");
-    mvprintw(15, ITEM_POS_Y, "    |  | O o O o| |");
-    mvprintw(16, ITEM_POS_Y, "     \\ '-------' /");
-    mvprintw(17, ITEM_POS_Y, "      `---------'");
+    mvprintw(2,  ITEM_POS_X, "       ( (       ");
+    mvprintw(3,  ITEM_POS_X, "        ) )      ");
+    mvprintw(4,  ITEM_POS_X, "      .----+----.");
+    mvprintw(5,  ITEM_POS_X, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_X, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_X, "      | |  _  | |");
+    mvprintw(8,  ITEM_POS_X, "      | | (o) | |");
+    mvprintw(9,  ITEM_POS_X, "      | | /|\\ | |");
+    mvprintw(10, ITEM_POS_X, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_X, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_X, "     /           \\");
+    mvprintw(13, ITEM_POS_X, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_X, "    |  |o O o O|  |");
+    mvprintw(15, ITEM_POS_X, "    |  | O o O o| |");
+    mvprintw(16, ITEM_POS_X, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_X, "      `---------'");
 }
 
 void extra_hp_sprite(void)
 {
-    mvprintw(2,  ITEM_POS_Y, "       .-\"\"-.      .-\"\"-.       ");
-    mvprintw(3,  ITEM_POS_Y, "     /        \\  /        \\      ");
-    mvprintw(4,  ITEM_POS_Y, "    |          \\/          |     ");
-    mvprintw(5,  ITEM_POS_Y, "    |   .--------------.   |     ");
-    mvprintw(6,  ITEM_POS_Y, "     \\  |    /\\  /\\    |  /      ");
-    mvprintw(7,  ITEM_POS_Y, "      \\ |   /  \\/  \\   | /       ");
-    mvprintw(8,  ITEM_POS_Y, "       \\|  /        \\  |/        ");
-    mvprintw(9,  ITEM_POS_Y, "        |  \\        /  |         ");
-    mvprintw(10, ITEM_POS_Y, "         \\  \\      /  /          ");
-    mvprintw(11, ITEM_POS_Y, "          \\  \\    /  /           ");
-    mvprintw(12, ITEM_POS_Y, "           \\  '--'  /            ");
-    mvprintw(13, ITEM_POS_Y, "            \\      /             ");
-    mvprintw(14, ITEM_POS_Y, "             `----'              ");  
+    mvprintw(2,  ITEM_POS_X, "       .-\"\"-.      .-\"\"-.       ");
+    mvprintw(3,  ITEM_POS_X, "     /        \\  /        \\      ");
+    mvprintw(4,  ITEM_POS_X, "    |          \\/          |     ");
+    mvprintw(5,  ITEM_POS_X, "    |   .--------------.   |     ");
+    mvprintw(6,  ITEM_POS_X, "     \\  |    /\\  /\\    |  /      ");
+    mvprintw(7,  ITEM_POS_X, "      \\ |   /  \\/  \\   | /       ");
+    mvprintw(8,  ITEM_POS_X, "       \\|  /        \\  |/        ");
+    mvprintw(9,  ITEM_POS_X, "        |  \\        /  |         ");
+    mvprintw(10, ITEM_POS_X, "         \\  \\      /  /          ");
+    mvprintw(11, ITEM_POS_X, "          \\  \\    /  /           ");
+    mvprintw(12, ITEM_POS_X, "           \\  '--'  /            ");
+    mvprintw(13, ITEM_POS_X, "            \\      /             ");
+    mvprintw(14, ITEM_POS_X, "             `----'              ");  
 }
 
 void extra_strength_sprite(void)
 {
-    mvprintw(2,  ITEM_POS_Y, "       .--------------.       ");
-    mvprintw(3,  ITEM_POS_Y, "      /   ______      \\      ");
-    mvprintw(4,  ITEM_POS_Y, "     /   /      \\      \\     ");
-    mvprintw(5,  ITEM_POS_Y, "    |   |  .---. |      |    ");
-    mvprintw(6,  ITEM_POS_Y, "    |   |  |   | |  |||||    ");
-    mvprintw(7,  ITEM_POS_Y, "    |   |  | + | |  |||||    ");
-    mvprintw(8,  ITEM_POS_Y, "    |   |  '---' |  |''''    ");
-    mvprintw(9,  ITEM_POS_Y, "    |   \\______/    |        ");
-    mvprintw(10, ITEM_POS_Y, "    |  .----------. |        ");
-    mvprintw(11, ITEM_POS_Y, "    |  |  ______  | |        ");
-    mvprintw(12, ITEM_POS_Y, "     \\ | |      | |/         ");
-    mvprintw(13, ITEM_POS_Y, "      \\| |______| |          ");
-    mvprintw(14, ITEM_POS_Y, "       '----------'          ");
+    mvprintw(2,  ITEM_POS_X, "       .--------------.       ");
+    mvprintw(3,  ITEM_POS_X, "      /   ______      \\      ");
+    mvprintw(4,  ITEM_POS_X, "     /   /      \\      \\     ");
+    mvprintw(5,  ITEM_POS_X, "    |   |  .---. |      |    ");
+    mvprintw(6,  ITEM_POS_X, "    |   |  |   | |  |||||    ");
+    mvprintw(7,  ITEM_POS_X, "    |   |  | + | |  |||||    ");
+    mvprintw(8,  ITEM_POS_X, "    |   |  '---' |  |''''    ");
+    mvprintw(9,  ITEM_POS_X, "    |   \\______/    |        ");
+    mvprintw(10, ITEM_POS_X, "    |  .----------. |        ");
+    mvprintw(11, ITEM_POS_X, "    |  |  ______  | |        ");
+    mvprintw(12, ITEM_POS_X, "     \\ | |      | |/         ");
+    mvprintw(13, ITEM_POS_X, "      \\| |______| |          ");
+    mvprintw(14, ITEM_POS_X, "       '----------'          ");
+}
+
+void boss_item_sprite(void)
+{
+    mvprintw(2,  ITEM_POS_X, "       ( (       ");
+    mvprintw(3,  ITEM_POS_X, "        ) )      ");
+    mvprintw(4,  ITEM_POS_X, "      .----+----.");
+    mvprintw(5,  ITEM_POS_X, "      |  _---_  |");
+    mvprintw(6,  ITEM_POS_X, "      | /     \\ |");
+    mvprintw(7,  ITEM_POS_X, "      | |  *  | |");
+    mvprintw(8,  ITEM_POS_X, "      | | / \\ | |");
+    mvprintw(9,  ITEM_POS_X, "      | | \\_/ | |");
+    mvprintw(10, ITEM_POS_X, "      | \\_   _/ |");
+    mvprintw(11, ITEM_POS_X, "      |   \"\"    |");
+    mvprintw(12, ITEM_POS_X, "     /           \\");
+    mvprintw(13, ITEM_POS_X, "    |  .-------.  |");
+    mvprintw(14, ITEM_POS_X, "    |  |* * * *|  |");
+    mvprintw(15, ITEM_POS_X, "    |  | * * * |  |");
+    mvprintw(16, ITEM_POS_X, "     \\ '-------' /");
+    mvprintw(17, ITEM_POS_X, "      `---------'");
+
 }

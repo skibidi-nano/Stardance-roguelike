@@ -17,18 +17,22 @@ void visible_map_init(int player_y, int player_x);
 void map_refresh(int player_refresh_y, int player_refresh_x, mapstate current_mapstate);
 
 int map_is_wall(int y, int x);
-int map_is_door(int y, int x);
+int map_is_door(int y, int x, mapstate *current_mapstate);
 int map_is_enemy(int y, int x);
 int map_is_item(int y, int x);
+int map_is_boss_item(int y, int x);
 
 void map_remove_enemy_at(int y, int x);
 void map_remove_item_at(int y, int x);
 
-void enemy_pursuit(int player_x, int player_y);
+void enemy_pursuit(int player_x, int player_y, mapstate current_mapstate);
 int signum(int input);
+
+void boss_item_creation(void);
 
 npc* position_of_enemy_array(void);
 int* position_of_room_counter(void);
-char value_of_part_of_map(int y, int x);
+int* position_of_boss_counter(void);
 int value_of_boss_counter(void);
+char value_of_part_of_map(int y, int x);
 #endif
