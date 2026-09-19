@@ -20,8 +20,7 @@ static int boss_counter = 0; //for dynamic stats
 //initialisation of the map array
 void map_init(mapstate current_mapstate)
 {
-    //for which enemies get spawned
-    int decide_enemies = 0; 
+    
     // for battle and door logic
     enemy_counter = 0;
     //for boss trigger
@@ -45,7 +44,16 @@ void map_init(mapstate current_mapstate)
             {
                 if (i < enemy_amnt)
                 {
-                    room_enemies[i]  = npc_init(current_room.width, current_room.height, i, TRUE);
+                    //for which enemies get spawned
+                    int decide_enemies = get_random_int(1, enemy_amnt);
+                    if (decide_enemies > 2)
+                    {
+                        room_enemies[i]  = npc_init(current_room.width, current_room.height, MODULO, i, TRUE);//enemy symbol (modulo enemy)
+                    }
+                    else
+                    {
+                        room_enemies[i]  = npc_init(current_room.width, current_room.height, ADDRESS, i, TRUE);//enemy symbol (evil address)
+                    }
                     enemy_counter++;
                 }
                 else 
@@ -89,14 +97,16 @@ void map_init(mapstate current_mapstate)
                     {
                         if (y == room_enemies[i].npc_y && x == room_enemies[i].npc_x && room_enemies[i].active == TRUE)
                         {
-                            decide_enemies = get_random_int(1, enemy_amnt);
-                            if (decide_enemies > 2)
+                            switch (room_enemies->npc_type)
                             {
-                                map[y][x] = '%'; //enemy symbol (modulo enemy)
-                            }
-                            else
-                            {
-                                map[y][x] = '&'; //enemy symbol (evil address)
+                                case MODULO:
+                                    map[y][x] = '%';
+                                    break;
+                                case ADDRESS:
+                                    map[y][x] = '&';
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
@@ -305,16 +315,12 @@ int map_is_item(int y, int x)
     {
         return 0; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items), only works when tweaking wall logic
     }
-    return map[y][x] == '+';
-}
-
-int map_is_boss_item(int y, int x)
-{
-    if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width)
+    if (map[y][x] == '+' || map[y][x] == '?')
     {
-        return 0; //change to 1 for semi debug mode (when going through doors that shouldnt be able to get access, you get items), only works when tweaking wall logic
+        return 1;
     }
-    return map[y][x] == '?';
+
+    return 0;
 }
 
 void map_remove_enemy_at(int y, int x) 
@@ -353,18 +359,43 @@ void map_remove_item_at(int y, int x)
 void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
 {
     direction dir;
+    entity (*enemy_ptr)[MAX_NUMBER_OF_NPCS] = get_location_of_enemies(); // get enemy array
     
     for (int i = 0; i < MAX_NUMBER_OF_NPCS; i++)
     {   
         if (room_enemies[i].active == true && current_mapstate != STATE_BOSS)
         {
-            int dy = player_y - room_enemies[i].npc_y;
-            int dx = player_x - room_enemies[i].npc_x;
+            
+            int dy;
+            int dx;
 
-            dir.dir_y = signum(dy);
-            dir.dir_x = signum(dx);
+            if (room_enemies[i].direction == true)
+            {
+                dy = player_y - room_enemies[i].npc_y;
+                dx = player_x - room_enemies[i].npc_x;
+                dir.dir_y = signum(dy);
+                dir.dir_x = signum(dx);
+            }
+            else
+            {
+                dy = room_enemies[i].npc_y - player_y;
+                dx = room_enemies[i].npc_x - player_x;
+                dir.dir_y = signum(dy);
+                dir.dir_x = signum(dx);
+                //long story short if enemy current_hp is smaller than enemy max_hp / 2
+                if (enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp < enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].max_hp / 2)
+                {
+                    enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp++;
+                }
+                else
+                {
+                    room_enemies[i].direction = true;
+                }
+            }
+                    
+            
 
-            if (dy == 1 || dy ==  0 || dy == -1)
+            if (room_enemies[i].direction == true && (dy == 1 || dy ==  0 || dy == -1))
             {
                 if (dx == 1 || dx == 0|| dx == -1)
                 {

@@ -6,7 +6,7 @@
 #include "entity.h"
 
 
-npc npc_init(int map_width, int map_height, int number, bool state)
+npc npc_init(int map_width, int map_height, type enemy_type, int number, bool state)
 {
     npc enemy;
     
@@ -16,8 +16,10 @@ npc npc_init(int map_width, int map_height, int number, bool state)
         enemy.npc_y = get_random_int(1, map_height - 2);
     } while (enemy.npc_x == 1 && enemy.npc_y == 1);
 
+    enemy.npc_type = enemy_type;
     enemy.number = number;
     enemy.active = state;
+    enemy.direction = state;
 
     return enemy;
 }

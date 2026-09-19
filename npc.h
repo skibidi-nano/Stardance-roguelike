@@ -8,11 +8,13 @@ typedef struct
     int npc_y;
     int npc_x;
     int number;
+    type npc_type;
     bool active;
+    bool direction;
 }
 npc;
 
-npc npc_init(int map_width, int map_height, int number, bool state);
+npc npc_init(int map_width, int map_height, type enemy_type, int number, bool state);
 npc boss_init(void);
 entity standard_enemy_stats(int max, int current, int power);
 

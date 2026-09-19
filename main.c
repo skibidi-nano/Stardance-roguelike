@@ -20,16 +20,11 @@ int handle_battle_input(int user_input);
 void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
 void reset_inventory(void);
+player_map value_of_player_pos(void);
+
 
 //player/enemy position variables
-int player_y = 1;
-int player_x = 1;
-int next_y = 0;
-int next_x = 0;
-int target_enemy_y;
-int target_enemy_x;
-int target_item_y;
-int target_item_x;
+player_map player_pos = {.y = 1, .x = 1, .next_y = 0, .next_x = 0,};
 
 //for highscore
 int score = 0;
@@ -108,7 +103,7 @@ int main(void)
                 break;
 
             case STATE_MAP:
-                map_refresh(player_y, player_x, current_mapstate);
+                map_refresh(player_pos.y, player_pos.x, current_mapstate);
                 break;
 
             case STATE_BATTLE:
@@ -143,16 +138,16 @@ void handle_menu_input(int user_input)
         case '1':  //regular mode
             map_init(current_mapstate);       // generate a new room
             reset_stats();    // reset player hp
-            player_y = 1;     // reset player position
-            player_x = 1;
+            player_pos.y = 1;     // reset player position
+            player_pos.x = 1;
             current_gamestate = STATE_MAP; 
             break;
         case '2': //debug mode
             current_mapstate = STATE_DEBUG;
             map_init(current_mapstate);
             reset_stats();
-            player_y = 1;
-            player_x = 1;
+            player_pos.y = 1;
+            player_pos.x = 1;
             current_gamestate = STATE_MAP; 
             break;
         case '3': //controls screen
@@ -184,22 +179,22 @@ void handle_controls_screen_input(int user_input)
 void handle_map_input(int user_input)
 {
     int boss_room_check;
-    next_y = player_y;
-    next_x = player_x;
+    player_pos.next_y = player_pos.y;
+    player_pos.next_x = player_pos.x;
 
     //action based on input
     switch(user_input) 
     {
-        case 'w': next_y--; break;
-        case 's': next_y++; break;
-        case 'a': next_x--; break;
-        case 'd': next_x++; break;
+        case 'w': player_pos.next_y--; break;
+        case 's': player_pos.next_y++; break;
+        case 'a': player_pos.next_x--; break;
+        case 'd': player_pos.next_x++; break;
     }
 
-    enemy_pursuit(player_y, player_x, current_mapstate);
+    enemy_pursuit(player_pos.y, player_pos.x, current_mapstate);
 
     //door collision check
-    if ((boss_room_check = map_is_door(next_y, next_x, &current_mapstate)))
+    if ((boss_room_check = map_is_door(player_pos.next_y, player_pos.next_x, &current_mapstate)))
     {
         //door logic doubles as boss trigger logic
         switch (boss_room_check)
@@ -207,52 +202,51 @@ void handle_map_input(int user_input)
             case BOSS_ROOM_ACTIVATION_COUNT: 
                 current_mapstate = STATE_BOSS;
                 map_init(current_mapstate);
-                player_y = 1;
-                player_x = 1;
+                player_pos.y = 1;
+                player_pos.x = 1;
                 break;
             default:
                 map_init(current_mapstate);
-                player_y = 1;
-                player_x = 1;
+                player_pos.y = 1;
+                player_pos.x = 1;
                 break;
         }
         
     }
     //player-enemy collision check
-    else if(map_is_enemy(next_y, next_x))
+    else if(map_is_enemy(player_pos.next_y, player_pos.next_x))
     {
-        target_enemy_y = next_y;
-        target_enemy_x = next_x;
+        player_pos.target_enemy_y = player_pos.next_y; ////////////////MIGHT NEED TO REVISIST
+        player_pos.target_enemy_x = player_pos.next_x;
         current_gamestate = STATE_BATTLE;
         battle_screen_init();
-        battle_init(target_enemy_y, target_enemy_x);
+        battle_init(player_pos.target_enemy_y, player_pos.target_enemy_x);
         score = 0; //reset score
     }
     //player-item collision check
-    else if(map_is_item(next_y, next_x))
+    else if(map_is_item(player_pos.next_y, player_pos.next_x))
     {
-        target_item_y = next_y;
-        target_item_x = next_x;
-        current_item = random_item(); //generate item every time a player collides with an item
+        player_pos.target_item_y = player_pos.next_y;
+        player_pos.target_item_x = player_pos.next_x;
+        switch (current_mapstate)
+        {
+            case STATE_BOSS:
+                current_item = BOSS_ITEM;
+                break;
+            default: 
+                current_item = random_item();
+        }
         current_gamestate = STATE_ITEM;
-        init_item_screen();
-    }
-    else if(map_is_boss_item(next_y, next_x))
-    {
-        target_item_y = next_y;
-        target_item_x = next_x;
-        current_gamestate = STATE_ITEM;
-        current_item = BOSS_ITEM;
         init_item_screen();
     }
     //player-wall collision check
-    else if (!map_is_wall(next_y, next_x))
+    else if (!map_is_wall(player_pos.next_y, player_pos.next_x))
     {
-        player_y = next_y;
-        player_x = next_x;
+        player_pos.y = player_pos.next_y;
+        player_pos.x = player_pos.next_x;
     }
     
-    visible_map_init(player_y, player_x);
+    visible_map_init(player_pos.y, player_pos.x);
 }
 
 int handle_battle_input(int user_input)
@@ -273,7 +267,7 @@ int handle_battle_input(int user_input)
     static battle_result outcome = BATTLE_IN_PROGRESS;
 
     //main battle logic function
-    outcome = process_battle_turn(battle_selection, lock, target_enemy_x, target_enemy_y);
+    outcome = process_battle_turn(battle_selection, lock, player_pos.target_enemy_x, player_pos.target_enemy_y);
 
     //reset lock variable (makes the game less buggy)
     lock = 0;
@@ -396,8 +390,8 @@ void handle_item_input(int user_input)
     {
         case ENTER_ESC:
         case ENTER_LEGAL:
-            map_remove_item_at(target_item_y, target_item_x);
-            visible_map_init(player_y, player_x);
+            map_remove_item_at(player_pos.target_item_y, player_pos.target_item_x);
+            visible_map_init(player_pos.y, player_pos.x);
             current_gamestate = STATE_MAP;
             break;
         
@@ -482,4 +476,9 @@ void reset_inventory(void)
     {
         inventory[i] = EMPTY;
     }
+}
+
+player_map value_of_player_pos(void)
+{
+    return player_pos;
 }

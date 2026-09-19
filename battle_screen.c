@@ -21,7 +21,10 @@ static entity *enemy_ptr;
 
 // initial stats entity
 static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
-static entity enemy;  
+static entity enemy[LAST_ENUM][MAX_NUMBER_OF_NPCS];
+static type entity_type; 
+static int entity_number;
+
 
 static int enemy_turn_counter = 0; //for poison potion
 static int player_turn_counter = 0; //for [COMING SOON]
@@ -46,7 +49,19 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
     //ENEMY LOGIC
     if (current_turn == TURN_ENEMY)
     {
-        
+        if (enemy_ptr->current_hp <= (player_ptr->attack_power) && value_of_part_of_map(BOSS_POSITION, BOSS_POSITION) != '*') // if hp is lower than 10% of the max hp
+        {
+            int chance = get_random_int(1, 10);
+            if (chance == 1)
+            {
+                current_turn = TURN_PLAYER;
+                npc *room_enemies;
+                room_enemies = position_of_enemy_array();
+                room_enemies[entity_number].direction = false;
+                return BATTLE_FLED;
+            }
+        }
+
         if (!boss_item) //if boss item is activated the enemy cant attack
         {
             // Enemy attacks player
@@ -131,16 +146,19 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
 
 void battle_init(int enemy_y, int enemy_x)
 {
+    entity_number = search_for_enemy();
     player = player_stats(player.max_hp, player.current_hp, player.attack_power);
     enemy_type = value_of_part_of_map(enemy_y, enemy_x);
         switch (enemy_type)
         {
-            case '&': enemy = stats_enemy(ADDRESS); break;
-            case '%': enemy = stats_enemy(MODULO); break;
-            case '*': enemy = stats_enemy(BOSS); break;
+            case '&': entity_type = ADDRESS; break;
+            case '%': entity_type = MODULO; break;
+            case '*': entity_type = BOSS; break;
         }
+
+        stats_enemy();
         player_ptr = &player; 
-        enemy_ptr = &enemy;
+        enemy_ptr = &enemy[entity_type][entity_number];
 }
 
 
@@ -213,34 +231,24 @@ void battle_screen_draw(choice selection)
     //Enemy set up
         //Enemy health bar
 
-    draw_health_bar(enemy.current_hp, enemy.max_hp, HEALTH_BAR_POSITION_ENEMY);
+    draw_health_bar(enemy[entity_type][entity_number].current_hp, enemy[entity_type][entity_number].max_hp, HEALTH_BAR_POSITION_ENEMY);
 
-    draw_current_hp(enemy.current_hp, HEALTH_BAR_POSITION_ENEMY + 1);
+    draw_current_hp(enemy[entity_type][entity_number].current_hp, HEALTH_BAR_POSITION_ENEMY + 1);
 
-    draw_current_strength(enemy.attack_power, HEALTH_BAR_POSITION_ENEMY + 1);
+    draw_current_strength(enemy[entity_type][entity_number].attack_power, HEALTH_BAR_POSITION_ENEMY + 1);
 
-    switch (enemy_type)
+    switch (entity_type)
     {
-        case '&': address_enemy_sprite(); break;
-        case '%': modulo_enemy_sprite(); break;
-        case '*': boss_sprite();
+        case ADDRESS: address_enemy_sprite(); break;
+        case MODULO: modulo_enemy_sprite(); break;
+        case BOSS: boss_sprite();
+        default: break;
     }
     
 
 
     //draw menu
-    if (selection == ATTACK)
-    {
-        battle_menu_draw(selection);
-    }
-    else if(selection == INVENTORY)
-    {
-        battle_menu_draw(selection);
-    }
-    else if(selection == RUN)
-    {
-        battle_menu_draw(selection);
-    }
+    battle_menu_draw(selection);
 
     for (int y = 0; y < BATTLE_LOG_HEIGHT; y++)
     {
@@ -273,38 +281,57 @@ void reset_stats(void)
     player.current_hp = player.max_hp; 
     player.attack_power = attack_power;
 
-    enemy.max_hp = 20;
-    enemy.current_hp = 20;
-    enemy.attack_power = 3;
+    enemy[entity_type][entity_number].max_hp = 0;
+    enemy[entity_type][entity_number].current_hp = 0;
+    enemy[entity_type][entity_number].attack_power = 0;
 }
 
-entity stats_enemy(type type)
+void stats_enemy(void)
 {
-    entity current_enemy;
-    switch (type)
+
+    switch (entity_type)
     {
         case ADDRESS: //stats for standard enemies
-            current_enemy.max_hp = 20 + value_of_boss_counter();
-            current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 2 + (2 * value_of_boss_counter());
-            current_enemy.type = ADDRESS;
+            enemy[ADDRESS][entity_number].max_hp = 20 + value_of_boss_counter();            
+            enemy[ADDRESS][entity_number].attack_power = 2 + (2 * value_of_boss_counter());
             break;
         case MODULO: //stats for special enemies
-            current_enemy.max_hp = 15 + value_of_boss_counter();
-            current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 4 + (2 * value_of_boss_counter());
-            current_enemy.type = MODULO;
+            enemy[MODULO][entity_number].max_hp = 15 + value_of_boss_counter();
+            enemy[MODULO][entity_number].attack_power = 4 + (2 * value_of_boss_counter());
             break;
         case BOSS:
-            current_enemy.max_hp = 25 + (2 * value_of_boss_counter());
-            current_enemy.current_hp = current_enemy.max_hp;
-            current_enemy.attack_power = 3 + (2 * value_of_boss_counter());
-            current_enemy.type = BOSS;
+            enemy[BOSS][entity_number].max_hp = 25 + (2 * value_of_boss_counter());
+            enemy[BOSS][entity_number].attack_power = 3 + (2 * value_of_boss_counter());
+            break;
+        default:
+            break;
 
 
     }
 
-    return current_enemy;
+    if (enemy[entity_type][entity_number].current_hp == 0)
+    {
+        enemy[entity_type][entity_number].current_hp = enemy[entity_type][entity_number].max_hp;
+    }
+}
+
+int search_for_enemy(void)
+{
+    player_map player_pos;
+    player_pos = value_of_player_pos();
+    npc *enemies = NULL;
+    enemies = position_of_enemy_array();
+
+    for (int i = 0; i < MAX_NUMBER_OF_NPCS; i++)
+    {
+        if (enemies[i].npc_x == player_pos.target_enemy_x && enemies[i].npc_y == player_pos.target_enemy_y)
+        {
+            return enemies[i].number;
+        }
+    }
+
+    return 0; ///////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 int* get_location_of(items item) //need to rewrite    ps:not sure tho probably just a name change
@@ -314,7 +341,7 @@ int* get_location_of(items item) //need to rewrite    ps:not sure tho probably j
         case HEAL: return &player.current_hp;
         case EXTRA_STRENGTH: return &attack_power;
         case EXTRA_HP: return &max_hp;
-        case DAMAGE: return &enemy.current_hp;
+        case DAMAGE: return &enemy[entity_type][entity_number].current_hp;
         default: return NULL;
     }
 }
@@ -327,6 +354,10 @@ bool* get_location_of_poison(void)
 bool* get_location_of_boss_bool(void)
 {
     return &boss_item;
+}
+
+entity (*get_location_of_enemies(void))[MAX_NUMBER_OF_NPCS] {
+    return enemy;
 }
 
 void call_battle_log(actions input_one, int input_two)

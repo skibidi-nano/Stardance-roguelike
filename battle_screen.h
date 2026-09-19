@@ -25,6 +25,8 @@ typedef enum
     RUN
 } choice;
 
+extern player_map value_of_player_pos(void);
+
 battle_result process_battle_turn(choice selection, int lock, int enemy_x, int enemy_y);
 void battle_init(int enemy_y, int enemy_x);
 void battle_screen_init(void);
@@ -33,9 +35,11 @@ void battle_screen_draw(choice selection);
 void battle_menu_draw(choice selection);
 
 void reset_stats(void);
-entity stats_enemy(type type);
+void stats_enemy(void);
+int search_for_enemy(void);
 
 int* get_location_of(items item);
 bool* get_location_of_poison(void);
 bool* get_location_of_boss_bool(void);
+entity (*get_location_of_enemies(void))[MAX_NUMBER_OF_NPCS];
 void call_battle_log(actions input_one, int input_two);
