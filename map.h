@@ -11,6 +11,8 @@ typedef struct
 } 
 direction;
 
+extern mapstate value_of_current_mapstate(void);
+
 void map_init(mapstate current_mapstate);
 void map_draw(mapstate current_mapstate);
 void visible_map_init(int player_y, int player_x);

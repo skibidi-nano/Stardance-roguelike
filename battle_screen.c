@@ -21,7 +21,7 @@ static entity *enemy_ptr;
 
 // initial stats entity
 static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
-static entity enemy[LAST_ENUM][MAX_NUMBER_OF_NPCS];
+static entity enemy[LAST_ENUM + 1][MAX_NUMBER_OF_NPCS];
 static type entity_type; 
 static int entity_number;
 
@@ -49,7 +49,8 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
     //ENEMY LOGIC
     if (current_turn == TURN_ENEMY)
     {
-        if (enemy_ptr->current_hp <= (player_ptr->attack_power) && value_of_part_of_map(BOSS_POSITION, BOSS_POSITION) != '*') // if hp is lower than 10% of the max hp
+        if (enemy_ptr->current_hp <= (player_ptr->attack_power)
+        && value_of_current_mapstate() != STATE_BOSS) // if hp is lower than 10% of the max hp
         {
             int chance = get_random_int(1, 10);
             if (chance == 1)
@@ -330,8 +331,7 @@ int search_for_enemy(void)
         }
     }
 
-    return 0; ///////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return LAST_ENUM;
 }
 
 int* get_location_of(items item) //need to rewrite    ps:not sure tho probably just a name change

@@ -94,7 +94,7 @@ player_map;
 
 //for boss fights
 #define BOSS_ROOM_DIMENSION 11
-#define BOSS_ROOM_ACTIVATION_COUNT 5
+#define BOSS_ROOM_ACTIVATION_COUNT 10
 #define BOSS_POSITION 5
 
 //for health bar

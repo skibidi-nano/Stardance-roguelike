@@ -21,6 +21,7 @@ void handle_item_input(int user_input);
 int handle_inventory_input(int user_input);
 void reset_inventory(void);
 player_map value_of_player_pos(void);
+mapstate value_of_current_mapstate(void);
 
 
 //player/enemy position variables
@@ -481,4 +482,9 @@ void reset_inventory(void)
 player_map value_of_player_pos(void)
 {
     return player_pos;
+}
+
+mapstate value_of_current_mapstate(void)
+{
+    return current_mapstate;
 }

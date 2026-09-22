@@ -48,17 +48,18 @@ void map_init(mapstate current_mapstate)
                     int decide_enemies = get_random_int(1, enemy_amnt);
                     if (decide_enemies > 2)
                     {
-                        room_enemies[i]  = npc_init(current_room.width, current_room.height, MODULO, i, TRUE);//enemy symbol (modulo enemy)
+                        room_enemies[i]  = npc_init(current_room.width, current_room.height, MODULO, i, true);//enemy symbol (modulo enemy)
                     }
                     else
                     {
-                        room_enemies[i]  = npc_init(current_room.width, current_room.height, ADDRESS, i, TRUE);//enemy symbol (evil address)
+                        room_enemies[i]  = npc_init(current_room.width, current_room.height, ADDRESS, i, true);//enemy symbol (evil address)
                     }
                     enemy_counter++;
                 }
                 else 
                 {
-                    room_enemies[i].active = FALSE;
+                    room_enemies[i].active = false;
+                    room_enemies[i].direction = false;
                     room_enemies[i].npc_x  = MAX_WIDTH - 1;
                     room_enemies[i].npc_y = MAX_HEIGHT - 1;
                 }
@@ -369,21 +370,24 @@ void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
             int dy;
             int dx;
 
-            if (room_enemies[i].direction == true)
+            if (room_enemies[i].direction == true) //chasing
             {
-                dy = player_y - room_enemies[i].npc_y;
+                dy = player_y - room_enemies[i].npc_y; //distance to player
                 dx = player_x - room_enemies[i].npc_x;
-                dir.dir_y = signum(dy);
+                dir.dir_y = signum(dy); //calculate direction
                 dir.dir_x = signum(dx);
             }
-            else
+            else //fleeing
             {
-                dy = room_enemies[i].npc_y - player_y;
+                dy = room_enemies[i].npc_y - player_y;  //distance to player
                 dx = room_enemies[i].npc_x - player_x;
-                dir.dir_y = signum(dy);
+                dir.dir_y = signum(dy); //calculate direction
                 dir.dir_x = signum(dx);
+
+                int current_hp = enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp;
+                int healing_threshhold = enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].max_hp / 2; 
                 //long story short if enemy current_hp is smaller than enemy max_hp / 2
-                if (enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp < enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].max_hp / 2)
+                if (current_hp < healing_threshhold)
                 {
                     enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp++;
                 }
@@ -399,7 +403,7 @@ void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
             {
                 if (dx == 1 || dx == 0|| dx == -1)
                 {
-                    break;
+                    continue;
                 }
             }
 
