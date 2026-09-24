@@ -17,7 +17,7 @@
 
 ### DEMO URL:
 
-coming soon!
+https://www.youtube.com/watch?v=chgOYJbs8Ro
 
 ### HOW TO PLAY
 
