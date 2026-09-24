@@ -195,7 +195,7 @@ void handle_map_input(int user_input)
     enemy_pursuit(player_pos.y, player_pos.x, current_mapstate);
 
     //door collision check
-    if ((boss_room_check = map_is_door(player_pos.next_y, player_pos.next_x, &current_mapstate)))
+    if ((boss_room_check = map_is_door(player_pos.next_y, player_pos.next_x)))
     {
         //door logic doubles as boss trigger logic
         switch (boss_room_check)
@@ -207,6 +207,7 @@ void handle_map_input(int user_input)
                 player_pos.x = 1;
                 break;
             default:
+                current_mapstate = STATE_STANDARD;
                 map_init(current_mapstate);
                 player_pos.y = 1;
                 player_pos.x = 1;
@@ -460,8 +461,9 @@ int handle_inventory_input(int user_input)
                 call_battle_log(PLAYER_BOSS_ITEM_USE, NO_DAMAGE_INPUT);
                 break;
 
-            default : break;
+            default : break;   
         }
+        inventory_full = false;
         current_gamestate = STATE_BATTLE;
     }
     else if (lock == ESC)

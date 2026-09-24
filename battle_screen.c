@@ -12,22 +12,21 @@
 
 static char battle_screen[BATTLE_SCREEN_HEIGHT][BATTLE_SCREEN_WIDTH];
 static char log_arr[BATTLE_LOG_HEIGHT][BATTLE_LOG_WIDTH];
-static int max_hp = 20;
-static int attack_power = 5;
+static int max_hp = PLAYER_MAX_HP;
+static int attack_power = PLAYER_ATTACK_DAMAGE;
 
 static char enemy_type;
 static entity *player_ptr;
 static entity *enemy_ptr;
 
 // initial stats entity
-static entity player = { .max_hp = 20, .current_hp = 20, .attack_power = 5 };
+static entity player = { .max_hp = PLAYER_MAX_HP, .current_hp = 20, .attack_power = PLAYER_ATTACK_DAMAGE };
 static entity enemy[LAST_ENUM + 1][MAX_NUMBER_OF_NPCS];
 static type entity_type; 
 static int entity_number;
 
 
 static int enemy_turn_counter = 0; //for poison potion
-static int player_turn_counter = 0; //for [COMING SOON]
 
 static bool poison = false;
 static bool boss_item = false;
@@ -80,7 +79,12 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
         }
         else
         {
-            boss_item = false;
+            static int boss_item_counter = 0;
+            boss_item_counter++;
+            if (boss_item_counter == 2)
+            {
+                boss_item = false;
+            }
         }
 
         
@@ -119,7 +123,7 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
                     battle_log(PLAYER_ATTACK, NO_DAMAGE_INPUT, log_arr);
                     battle_log(ENEMY_DAMAGE_TOOK, player_ptr->attack_power, log_arr);
 
-                    player_turn_counter++;
+                    //player_turn_counter++;
                     current_turn = TURN_ENEMY; // Switch turn
                     break;
 
@@ -135,7 +139,7 @@ battle_result process_battle_turn(choice selection, int lock, int enemy_x, int e
                     }
                     else
                     {
-                        player_turn_counter++;
+                        //player_turn_counter++;
                         current_turn = TURN_ENEMY;
                     }
             }
@@ -218,7 +222,7 @@ void battle_screen_draw(choice selection)
     //Player set up
         //Player health bar
 
-    draw_health_bar(player.current_hp, player.max_hp, HEALTH_BAR_POSITION_PLAYER);
+    draw_health_bar(player.current_hp / 5, player.max_hp / 5, HEALTH_BAR_POSITION_PLAYER);
 
     draw_current_hp(player.current_hp, HEALTH_BAR_POSITION_PLAYER + 1);
 
@@ -232,7 +236,7 @@ void battle_screen_draw(choice selection)
     //Enemy set up
         //Enemy health bar
 
-    draw_health_bar(enemy[entity_type][entity_number].current_hp, enemy[entity_type][entity_number].max_hp, HEALTH_BAR_POSITION_ENEMY);
+    draw_health_bar(enemy[entity_type][entity_number].current_hp / 5, enemy[entity_type][entity_number].max_hp / 5, HEALTH_BAR_POSITION_ENEMY);
 
     draw_current_hp(enemy[entity_type][entity_number].current_hp, HEALTH_BAR_POSITION_ENEMY + 1);
 
@@ -293,16 +297,16 @@ void stats_enemy(void)
     switch (entity_type)
     {
         case ADDRESS: //stats for standard enemies
-            enemy[ADDRESS][entity_number].max_hp = 20 + value_of_boss_counter();            
-            enemy[ADDRESS][entity_number].attack_power = 2 + (2 * value_of_boss_counter());
+            enemy[ADDRESS][entity_number].max_hp = 80 + (4 * value_of_boss_counter());            
+            enemy[ADDRESS][entity_number].attack_power = 9 + (2 * value_of_boss_counter());
             break;
         case MODULO: //stats for special enemies
-            enemy[MODULO][entity_number].max_hp = 15 + value_of_boss_counter();
-            enemy[MODULO][entity_number].attack_power = 4 + (2 * value_of_boss_counter());
+            enemy[MODULO][entity_number].max_hp = 75 + (3 * value_of_boss_counter());
+            enemy[MODULO][entity_number].attack_power = 12 + (2 * value_of_boss_counter());
             break;
         case BOSS:
-            enemy[BOSS][entity_number].max_hp = 25 + (2 * value_of_boss_counter());
-            enemy[BOSS][entity_number].attack_power = 3 + (2 * value_of_boss_counter());
+            enemy[BOSS][entity_number].max_hp = 120 + (6 * value_of_boss_counter());
+            enemy[BOSS][entity_number].attack_power = 15 + (2 * value_of_boss_counter());
             break;
         default:
             break;

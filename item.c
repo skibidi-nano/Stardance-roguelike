@@ -199,6 +199,8 @@ void poison_call(int turn_counter)
     }
 }
 
+
+
 void heal_sprite(void)
 {
     mvprintw(2,  ITEM_POS_X, "       ( (       ");

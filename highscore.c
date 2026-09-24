@@ -13,7 +13,8 @@ void score_register(void)
     FILE *input = fopen("highscore.txt", "r+b");
     if (input == NULL)
     {
-        return;
+        input = fopen("highscore.txt", "w+b");
+        if (input == NULL) return;
     }
 
     int current_highscore = 0;
@@ -39,7 +40,7 @@ int get_highscore(void)
     FILE *input = fopen("highscore.txt", "r+b");
     if (input == NULL)
     {
-        return -1;
+        return 0;
     }
 
     int current_highscore = 0;

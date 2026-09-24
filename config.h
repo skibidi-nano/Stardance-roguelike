@@ -53,6 +53,10 @@ player_map;
 #define MAX_HEIGHT 20
 #define MIN_HEIGHT 5
 
+//for set room gem
+#define SET_WIDTH 20
+#define SET_HEIGHT 20
+
 //for item screen gen
 #define ITEM_SCREEN_WIDTH 80
 #define ITEM_SCREEN_HEIGHT 20
@@ -80,6 +84,11 @@ player_map;
 
 //BATTLE /////////////////////////////////
 
+//for player battle
+#define PLAYER_ATTACK_DAMAGE 20
+#define PLAYER_MAX_HP 100
+
+
 //for battle screen gen
 #define BATTLE_SCREEN_WIDTH 80
 #define BATTLE_SCREEN_HEIGHT 20
@@ -88,9 +97,9 @@ player_map;
 #define MAX_HP_LENGTH 78
 
 //for items in battle
-#define HEALING_AMOUNT 5
-#define DAMAGE_POTION_AMOUNT 4
-#define POISON_AMOUNT 3
+#define HEALING_AMOUNT 25
+#define DAMAGE_POTION_AMOUNT 25
+#define POISON_AMOUNT 6
 
 //for boss fights
 #define BOSS_ROOM_DIMENSION 11
@@ -125,8 +134,8 @@ player_map;
 //for items in main loop
 #define INVENTORY_SIZE 10
 #define MAXIMUM_ITEMS 5
-#define EXTRA_STRENGTH_AMOUNT 1
-#define EXTRA_HP_AMOUNT 2
+#define EXTRA_STRENGTH_AMOUNT 5
+#define EXTRA_HP_AMOUNT 25
 
 /////////////////////////////////////////////////
 

@@ -148,5 +148,5 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
 
 void fill_log_arr(int y, int x, char *msg, char log_arr[BATTLE_LOG_HEIGHT][BATTLE_LOG_WIDTH])
 {
-    snprintf(&log_arr[y][x], BATTLE_LOG_WIDTH, "%s", msg);
+    snprintf(&log_arr[y][x], BATTLE_LOG_WIDTH - x, "%s", msg);
 }

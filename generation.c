@@ -48,3 +48,17 @@ room random_room_gen(void)
     }
     return rndm_room;
 }
+
+room set_room_gen(int width, int height)
+{
+    room set_room;
+
+    set_room.height = height;
+    set_room.width = width;
+    set_room.door_x = 0;
+    set_room.door_y = 0;
+    set_room.x = 0;
+    set_room.y = 0;
+
+    return set_room;
+}

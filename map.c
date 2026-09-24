@@ -30,11 +30,13 @@ void map_init(mapstate current_mapstate)
     memset(visible_map, '#', sizeof(map));
 
     //to gen a fresh room every time
-    current_room = random_room_gen();
+    
 
     switch (current_mapstate)
     {
         case STATE_STANDARD:
+
+            current_room = random_room_gen();
             
             //dynamic number of enemies
             int enemy_amnt = (current_room.width * current_room.height) / 200; //<- change this to impact the amount of enemies
@@ -126,6 +128,8 @@ void map_init(mapstate current_mapstate)
 
         case STATE_DEBUG: 
 
+            current_room = set_room_gen(SET_WIDTH, SET_HEIGHT);
+
             //fill the map array for no junk values
             for (int y = 0; y < current_room.height; y++)
             {
@@ -149,6 +153,8 @@ void map_init(mapstate current_mapstate)
 
         case STATE_BOSS:
         
+            current_room = set_room_gen(BOSS_ROOM_DIMENSION, BOSS_ROOM_DIMENSION);
+
             //counter variables for
                 //battle and door logic
             enemy_counter++;
@@ -276,7 +282,7 @@ int map_is_wall(int y, int x)
     return map[y][x] == '#';
 }
 
-int map_is_door(int y, int x, mapstate *current_mapstate)
+int map_is_door(int y, int x)
 {
     if (y < 0 || y >= current_room.height || x < 0 || x >= current_room.width || enemy_counter != 0)
     {
@@ -285,11 +291,6 @@ int map_is_door(int y, int x, mapstate *current_mapstate)
     else if (room_counter == BOSS_ROOM_ACTIVATION_COUNT && map[y][x] == '0')
     {
         return BOSS_ROOM_ACTIVATION_COUNT;
-    }
-    else if (*current_mapstate == STATE_BOSS && room_enemies[0].active == false && map[y][x] == '0')
-    {
-        map_init(*current_mapstate);
-        *current_mapstate = STATE_STANDARD;
     }
 
     return map[y][x] == '0';
@@ -389,7 +390,7 @@ void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
                 //long story short if enemy current_hp is smaller than enemy max_hp / 2
                 if (current_hp < healing_threshhold)
                 {
-                    enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp++;
+                    enemy_ptr[room_enemies[i].npc_type][room_enemies[i].number].current_hp += 5;
                 }
                 else
                 {
@@ -423,7 +424,7 @@ void enemy_pursuit(int player_y, int player_x, mapstate current_mapstate)
 
             if(illegal_check)
             {
-                break;
+                continue;
             }
 
             char tmp = value_of_part_of_map(room_enemies[i].npc_y, room_enemies[i].npc_x);

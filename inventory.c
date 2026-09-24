@@ -72,28 +72,28 @@ void print_frame_select(items item, int position_y, int position_x)
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+ <3 + <<<");
             mvprintw(position_y + 2,  position_x, "++++++");
-            mvprintw(3, 5, "HEALS YOU FOR 5 HP");
+            mvprintw(3, 5, "HEALS YOU FOR %i HP", HEALING_AMOUNT);
             break;
 
         case DAMAGE:
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+ !  + <<<");
             mvprintw(position_y + 2,  position_x, "++++++");
-            mvprintw(3, 5, "DEALS 4 HP OF DAMAGE TO YOUR OPPONENT");
+            mvprintw(3, 5, "DEALS %i HP OF DAMAGE TO YOUR OPPONENT", DAMAGE_POTION_AMOUNT);
             break;
 
         case POISON:
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+X_X + <<<");
             mvprintw(position_y + 2,  position_x, "++++++");
-            mvprintw(3, 5, "DEALS 2 HP OF DAMAGE TO YOUR OPPONENT FOR 3 ROUNDS");
+            mvprintw(3, 5, "DEALS %i HP OF DAMAGE TO YOUR OPPONENT FOR 3 ROUNDS", POISON_AMOUNT);
             break;
 
         case BOSS_ITEM:
             mvprintw(position_y,  position_x, "++++++");
             mvprintw(position_y + 1,  position_x, "+****+ <<<");
             mvprintw(position_y + 2,  position_x, "++++++");
-            mvprintw(3, 5, "MAKES YOU IMMUNE TO DAMAGE FOR ONE TURN");
+            mvprintw(3, 5, "MAKES YOU IMMUNE TO DAMAGE FOR TWO TURNS");
             break;
 
         case EMPTY:
@@ -164,6 +164,7 @@ pass assign_item_to_inventory(items inventory[INVENTORY_SIZE], items current_ite
     if (item_check  == 0 && current_item == BOSS_ITEM)
     {
         inventory[0] = current_item;
+        return ENTER_LEGAL;
     }
 
     return ENTER_ILLEGAL;

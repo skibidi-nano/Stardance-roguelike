@@ -19,7 +19,7 @@ void visible_map_init(int player_y, int player_x);
 void map_refresh(int player_refresh_y, int player_refresh_x, mapstate current_mapstate);
 
 int map_is_wall(int y, int x);
-int map_is_door(int y, int x, mapstate *current_mapstate);
+int map_is_door(int y, int x);
 int map_is_enemy(int y, int x);
 int map_is_item(int y, int x);
 
