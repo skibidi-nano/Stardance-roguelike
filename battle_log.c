@@ -18,63 +18,52 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
     current_action = action;
 
     static char msg[BATTLE_LOG_WIDTH];
-    static char *str = NULL;
 
     battle_log_init();
 
     switch (current_action)
     {
         case PLAYER_ATTACK:
-            str = "YOU ATTACKED THE ENEMY";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU ATTACKED THE ENEMY");
             break;
 
         case ENEMY_ATTACK:
-            str = "ENEMY ATTACKED YOU";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "ENEMY ATTACKED YOU");
             break;
 
 
         case PLAYER_DAMAGE_TOOK:
-            str = "YOU TOOK %i DAMAGE";
-            snprintf(msg, sizeof(msg), str, current_damage);
+            snprintf(msg, sizeof(msg), "YOU TOOK %i DAMAGE", current_damage);
             break;
 
         case ENEMY_DAMAGE_TOOK:
-            str = "ENEMY TOOK %i DAMAGE";
-            snprintf(msg, sizeof(msg), str, current_damage);
+            snprintf(msg, sizeof(msg), "ENEMY TOOK %i DAMAGE", current_damage);
             break;
     
 
         case PLAYER_FAILED_RUN:
-            str = "RUNNING FAILED";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "RUNNING FAILED");
             break;
 
 
         case PLAYER_HEAL_USE:
-            str = "YOU USED A HEALING POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A HEALING POTION");
             break;
 
         case PLAYER_DAMAGE_USE:
-            str = "YOU USED A DAMAGE POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A DAMAGE POTION");
             break;
 
         case PLAYER_POISON_USE:
-            str = "YOU USED A POISON POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A POISON POTION");
             break;
 
         case PLAYER_BOSS_ITEM_USE:
-            str = "YOU USED A BOSS POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A BOSS POTION");
             break;
 
         case POISON_POTION_TICK:
-            str = "POISON DID %i DAMAGE TO YOUR OPPONENT";
-            snprintf(msg, sizeof(msg), str, current_damage); //%i turns remaining
+            snprintf(msg, sizeof(msg), "POISON DID %i DAMAGE TO YOUR OPPONENT", current_damage); //%i turns remaining
             break;
 
         default:
@@ -86,57 +75,47 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
     switch (previous_action)
     {
         case PLAYER_ATTACK:
-            str = "YOU ATTACKED THE ENEMY";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU ATTACKED THE ENEMY");
             break;
 
         case ENEMY_ATTACK:
-            str = "ENEMY ATTACKED YOU";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "ENEMY ATTACKED YOU");
             break;
 
 
         case PLAYER_DAMAGE_TOOK:
-            str = "YOU TOOK %i DAMAGE";
-            snprintf(msg, sizeof(msg), str, previous_damage);
+            snprintf(msg, sizeof(msg), "YOU TOOK %i DAMAGE", previous_damage);
             break;
 
         case ENEMY_DAMAGE_TOOK:
-            str = "ENEMY TOOK %i DAMAGE";
-            snprintf(msg, sizeof(msg), str, previous_damage);
+            snprintf(msg, sizeof(msg), "ENEMY TOOK %i DAMAGE", previous_damage);
             break;
     
 
         case PLAYER_FAILED_RUN:
-            str = "RUNNING FAILED";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "RUNNING FAILED");
             break;
 
 
         case PLAYER_HEAL_USE:
-            str = "YOU USED A HEALING POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A HEALING POTION");
             break;
 
         case PLAYER_DAMAGE_USE:
-            str = "YOU USED A DAMAGE POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A DAMAGE POTION");
             break;
 
         case PLAYER_POISON_USE:
-            str = "YOU USED A POISON POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A POISON POTION");
             break;
 
         case PLAYER_BOSS_ITEM_USE:
-            str = "YOU USED A BOSS POTION";
-            snprintf(msg, sizeof(msg), str);
+            snprintf(msg, sizeof(msg), "YOU USED A BOSS POTION");
             break;
 
 
         case POISON_POTION_TICK:
-            str = "POISON DID %i DAMAGE TO YOUR OPPONENT";
-            snprintf(msg, sizeof(msg), str, previous_damage); //%i turns remaining
+            snprintf(msg, sizeof(msg), "POISON DID %i DAMAGE TO YOUR OPPONENT", previous_damage); //%i turns remaining
             break;
 
         default:
@@ -148,5 +127,5 @@ void battle_log(actions action, int damage, char log_arr[BATTLE_LOG_HEIGHT][BATT
 
 void fill_log_arr(int y, int x, char *msg, char log_arr[BATTLE_LOG_HEIGHT][BATTLE_LOG_WIDTH])
 {
-    snprintf(&log_arr[y][x], BATTLE_LOG_WIDTH - x, "%s", msg);
+    snprintf(&log_arr[y][x], BATTLE_LOG_WIDTH, "%s", msg);
 }
